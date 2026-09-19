@@ -58,8 +58,53 @@ async function waitForPreference(repository, expected) {
         await waitForPreference(repository, 'en');
         await page.locator('#storageStatus').filter({ hasText: 'Saved in the database' }).waitFor();
         assert.equal(await page.locator('html').getAttribute('dir'), 'ltr');
+        assert.equal((await page.locator('#btnLanguageToggle').innerText()).trim(), 'FA');
         assert.equal((await page.locator('#btnAddCard').innerText()).trim(), 'New card');
+        assert.match((await page.locator('.cat-review-btn').innerText()).trim(), /Review/);
         assert.equal((await page.locator('.card-row .col-meaning').innerText()).trim(), 'معنی');
+
+        await page.setViewportSize({ width: 390, height: 844 });
+        const layoutAudit = await page.evaluate(() => {
+            const overflow = [...document.body.querySelectorAll('*')]
+                .filter((element) => {
+                    const style = getComputedStyle(element);
+                    if (style.display === 'none' || style.visibility === 'hidden') return false;
+                    const rect = element.getBoundingClientRect();
+                    if (rect.bottom < 0 || rect.top > innerHeight || rect.width === 0 || rect.height === 0) return false;
+                    return rect.left < -1 || rect.right > innerWidth + 1;
+                })
+                .map((element) => ({
+                    tag: element.tagName.toLowerCase(),
+                    id: element.id,
+                    className: String(element.className || '').slice(0, 90),
+                    text: String(element.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 80),
+                    rect: {
+                        left: Math.round(element.getBoundingClientRect().left),
+                        right: Math.round(element.getBoundingClientRect().right),
+                        width: Math.round(element.getBoundingClientRect().width),
+                    },
+                }));
+            return { viewport: innerWidth, documentWidth: document.documentElement.scrollWidth, overflow };
+        });
+        assert.equal(
+            layoutAudit.documentWidth,
+            layoutAudit.viewport,
+            `English mobile layout must not overflow horizontally: ${JSON.stringify(layoutAudit.overflow)}`,
+        );
+        assert.deepEqual(layoutAudit.overflow, []);
+        assert.equal(await page.locator('#modeExplainer').evaluate((element) => getComputedStyle(element).textAlign), 'start');
+        assert.notEqual(
+            await page.locator('.welcome-actions .text-link span').evaluate((element) => getComputedStyle(element).transform),
+            'none',
+        );
+        assert.equal(
+            await page.locator('#btnLanguageToggle').evaluate((element) => getComputedStyle(element).borderTopStyle),
+            'solid',
+        );
+        assert.ok(
+            Number.parseFloat(await page.locator('.stat-label').first().evaluate((element) => getComputedStyle(element).fontSize)) >= 9,
+        );
+        await page.setViewportSize({ width: 1440, height: 1000 });
 
         await page.reload();
         await page.waitForFunction(() => document.documentElement.dataset.ready === 'true');

@@ -36,7 +36,7 @@ try {
     $health = $null
     $errorLog = $null
     try { $health = Invoke-RestMethod "$appAddress/api/health" -TimeoutSec 2 } catch {}
-    if ($health -and $health.application -eq 'leitner-box' -and $health.version -ne '2.1.0') {
+    if ($health -and $health.application -eq 'leitner-box' -and $health.version -ne '2.1.1') {
         if (-not (Stop-StaleLeitnerService)) {
             throw 'An older Leitner service is still running. Close it or restart Windows, then try again.'
         }
@@ -66,7 +66,7 @@ try {
         }
         throw "Leitner could not start.`n`n$detail`n`nLog: $errorLog"
     }
-    if ($health.application -ne 'leitner-box' -or $health.version -ne '2.1.0') {
+    if ($health.application -ne 'leitner-box' -or $health.version -ne '2.1.1') {
         throw "Another application is using port $portNumber."
     }
     if ($NoBrowser) { Write-Output $appAddress; exit 0 }

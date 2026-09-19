@@ -65,7 +65,7 @@ export function createApplicationServer(repository, config) {
             if (url.pathname === '/api/health' && req.method === 'GET') {
                 json(res, 200, {
                     application: 'leitner-box',
-                    version: '2.1.0',
+                    version: '2.1.1',
                     database: 'sqlite',
                     ready: true,
                     initialized: repository.read().initialized,

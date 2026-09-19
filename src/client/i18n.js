@@ -68,6 +68,7 @@ const ENGLISH = new Map([
     ['هر ۱۴ روز', 'Every 14 days'],
     ['هر ۳۰ روز', 'Every 30 days'],
     ['شروع مرور', 'Start review'],
+    ['مرور', 'Review'],
     ['مرور موضوعی', 'Review by topic'],
     ['کارت‌های آماده مرور را بر اساس موضوع تمرین کنید', 'Practise due cards by topic'],
     ['پیدا کردن موضوع…', 'Find a topic…'],
@@ -471,7 +472,7 @@ export function createI18n(initialLanguage = 'fa') {
 
     function updateToggleLabels() {
         document.querySelectorAll('[data-language-toggle-label]').forEach((label) => {
-            const nextLabel = language === 'fa' ? 'EN' : 'فا';
+            const nextLabel = language === 'fa' ? 'EN' : 'FA';
             if (label.textContent !== nextLabel) label.textContent = nextLabel;
         });
         document.querySelectorAll('[data-language-toggle]').forEach((button) => {
