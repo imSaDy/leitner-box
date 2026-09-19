@@ -40,7 +40,7 @@ const check = (value, message) => {
         if (seed)
             repository.commit({
                 state: initial(),
-                preferences: defaultPreferences(),
+                preferences: { ...defaultPreferences(), language: 'fa' },
                 expectedRevision: 0,
                 operationId: randomUUID(),
             });
@@ -90,7 +90,7 @@ const check = (value, message) => {
             mimeType: 'application/json',
             buffer: Buffer.from('{"cards":"invalid"}'),
         });
-        await migration.page.locator('#setupError').filter({ hasText: 'فهرست' }).waitFor();
+        await migration.page.locator('#setupError').filter({ hasText: 'list of cards' }).waitFor();
         check(!migration.repository.read().initialized, 'invalid migration does not initialize database');
         const sourceState = initial();
         sourceState.stats.history = [
@@ -115,6 +115,7 @@ const check = (value, message) => {
         assert.deepEqual(migration.repository.read().state, sourceState);
         checks++;
         check((await migration.page.locator('html').getAttribute('data-theme')) === 'light', 'migration retains theme');
+        check((await migration.page.locator('html').getAttribute('lang')) === 'fa', 'legacy migration retains Persian');
         check(
             (await migration.page.locator('#combinedBatchSizeInput').inputValue()) === '4',
             'migration retains batch size'
@@ -181,7 +182,7 @@ const check = (value, message) => {
         newer.cards[0].notes = 'Edited in another window';
         conflict.repository.commit({
             state: newer,
-            preferences: defaultPreferences(),
+            preferences: { ...defaultPreferences(), language: 'fa' },
             expectedRevision: 1,
             operationId: randomUUID(),
         });

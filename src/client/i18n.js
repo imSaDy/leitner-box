@@ -244,6 +244,7 @@ const ENGLISH = new Map([
     ['در حال انتقال اطلاعات…', 'Importing data…'],
     ['نسخهٔ پشتیبان دانلود شد', 'Backup downloaded'],
     ['فرمت فایل نامعتبر است', 'Invalid file format'],
+    ['فایل باید شامل فهرست کارت‌ها باشد.', 'The file must include a list of cards.'],
     ['فایل JSON خوانا نیست.', 'The JSON file could not be read.'],
     ['اولین نسخهٔ پشتیبان را بسازید.', 'Create your first backup.'],
     ['این جمله در همین دسته قبلاً وجود دارد', 'This sentence already exists in this category.'],
@@ -301,7 +302,7 @@ const ATTRIBUTES = ['title', 'placeholder', 'aria-label', 'content'];
 const USER_CONTENT_SELECTOR = [
     '[translate="no"]',
     '.word-text',
-    '.col-meaning',
+    'td.col-meaning',
     '.category-badge',
     '.cat-review-name',
     '.phonetic-text:not(.sentence-type-label)',
@@ -417,7 +418,7 @@ function isUserContent(node) {
     return Boolean(element?.closest(USER_CONTENT_SELECTOR));
 }
 
-export function createI18n(initialLanguage = 'fa') {
+export function createI18n(initialLanguage = 'en') {
     let language = initialLanguage === 'en' ? 'en' : 'fa';
     let observer = null;
     const listeners = new Set();

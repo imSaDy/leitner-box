@@ -89,7 +89,7 @@ export const defaultPreferences = () => ({
     theme: 'dark',
     reviewMode: 'flashcard',
     combinedBatchSize: 10,
-    language: 'fa',
+    language: 'en',
 });
 export const emptyState = () => ({
     cards: [],
@@ -104,6 +104,8 @@ export function decodeImport(payload) {
         preferences = defaultPreferences(),
         legacy = null;
     if (payload.format === 'leitner-migration-v1') {
+        // The browser-only legacy app was Persian-only, so keep its migration familiar.
+        preferences.language = 'fa';
         if (!record(payload.legacy) || typeof payload.legacy.leitner_data !== 'string')
             fail('اطلاعات اصلی نسخهٔ قدیمی در فایل نیست.');
         legacy = payload.legacy;

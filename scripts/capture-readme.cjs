@@ -71,8 +71,6 @@ const { chromium } = require('@playwright/test');
     try {
         await page.goto(`http://127.0.0.1:${server.address().port}`);
         await page.waitForFunction(() => document.documentElement.dataset.ready === 'true');
-        await page.locator('#btnLanguageToggle').click();
-        await page.waitForFunction(() => document.documentElement.lang === 'en');
         await page.locator('.workspace-nav a').first().filter({ hasText: 'Study desk' }).waitFor();
         await page.waitForTimeout(350);
         await page.screenshot({ path: path.join(output, 'dashboard-en.png'), animations: 'disabled' });

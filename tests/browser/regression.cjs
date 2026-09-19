@@ -88,7 +88,7 @@ async function createPage(version, data = fixture()) {
         const repository = new LeitnerRepository(directory);
         repository.commit({
             state: data,
-            preferences: defaultPreferences(),
+            preferences: { ...defaultPreferences(), language: 'fa' },
             expectedRevision: 0,
             operationId: require('node:crypto').randomUUID(),
         });

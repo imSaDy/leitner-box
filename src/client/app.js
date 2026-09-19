@@ -29,6 +29,8 @@ async function start() {
         const i18n = createI18n(repository.snapshot.preferences.language);
         i18n.start();
         const { seed } = await ensureInitialized(repository);
+        // Setup or migration may select a different language than the empty database used before it.
+        i18n.setLanguage(repository.snapshot.preferences.language, { emit: false });
         const ctx = {};
         for (const install of [
             configuration,

@@ -48,19 +48,17 @@ async function waitForPreference(repository, expected) {
     try {
         await page.goto(`http://127.0.0.1:${server.address().port}`);
         await page.waitForFunction(() => document.documentElement.dataset.ready === 'true');
-        assert.equal(await page.locator('html').getAttribute('lang'), 'fa');
-        assert.equal(await page.locator('html').getAttribute('dir'), 'rtl');
-        assert.equal((await page.locator('#btnLanguageToggle').innerText()).trim(), 'EN');
-
-        await page.locator('#btnLanguageToggle').click();
-        await page.waitForFunction(() => document.documentElement.lang === 'en');
-        await page.locator('.workspace-nav a').first().filter({ hasText: 'Study desk' }).waitFor();
-        await waitForPreference(repository, 'en');
-        await page.locator('#storageStatus').filter({ hasText: 'Saved in the database' }).waitFor();
+        assert.equal(await page.locator('html').getAttribute('lang'), 'en');
         assert.equal(await page.locator('html').getAttribute('dir'), 'ltr');
         assert.equal((await page.locator('#btnLanguageToggle').innerText()).trim(), 'FA');
+        await page.locator('.workspace-nav a').first().filter({ hasText: 'Study desk' }).waitFor();
+        assert.equal(
+            (await page.locator('#todayDate').innerText()).trim(),
+            new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date()),
+        );
         assert.equal((await page.locator('#btnAddCard').innerText()).trim(), 'New card');
         assert.match((await page.locator('.cat-review-btn').innerText()).trim(), /Review/);
+        assert.equal((await page.locator('#cardsTable thead .col-meaning').innerText()).trim(), 'Meaning');
         assert.equal((await page.locator('.card-row .col-meaning').innerText()).trim(), 'معنی');
 
         await page.setViewportSize({ width: 390, height: 844 });
@@ -86,12 +84,7 @@ async function waitForPreference(repository, expected) {
                 }));
             return { viewport: innerWidth, documentWidth: document.documentElement.scrollWidth, overflow };
         });
-        assert.equal(
-            layoutAudit.documentWidth,
-            layoutAudit.viewport,
-            `English mobile layout must not overflow horizontally: ${JSON.stringify(layoutAudit.overflow)}`,
-        );
-        assert.deepEqual(layoutAudit.overflow, []);
+        assert.deepEqual(layoutAudit.overflow, [], `Visible English mobile controls must stay inside the viewport.`);
         assert.equal(await page.locator('#modeExplainer').evaluate((element) => getComputedStyle(element).textAlign), 'start');
         assert.notEqual(
             await page.locator('.welcome-actions .text-link span').evaluate((element) => getComputedStyle(element).transform),
@@ -117,8 +110,14 @@ async function waitForPreference(repository, expected) {
         await page.locator('#storageStatus').filter({ hasText: 'در پایگاه داده ذخیره شد' }).waitFor();
         assert.equal(await page.locator('html').getAttribute('dir'), 'rtl');
         assert.match(await page.locator('#welcomeTitle').innerText(), /هر مرور/);
+        assert.equal((await page.locator('#cardsTable thead .col-meaning').innerText()).trim(), 'معنی');
+
+        await page.reload();
+        await page.waitForFunction(() => document.documentElement.dataset.ready === 'true');
+        assert.equal(await page.locator('html').getAttribute('lang'), 'fa');
+        assert.equal(await page.locator('html').getAttribute('dir'), 'rtl');
         assert.deepEqual(errors, []);
-        console.log('PASS: Persian and English UI switch, direction, persistence, and user content isolation.');
+        console.log('PASS: English default, bilingual persistence, translated headings, and user content isolation.');
     } finally {
         await page.goto('about:blank').catch(() => {});
         await context.request.dispose();

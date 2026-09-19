@@ -284,13 +284,16 @@
             { passive: true }
         );
         syncNavigation();
-        document.addEventListener('leitner-language-change', () => {
+        const syncLanguageUI = () => {
             renderToday();
             syncWelcome();
             syncModes();
             filterTopics();
             syncLibrary();
-        });
+        };
+        document.addEventListener('leitner-language-change', syncLanguageUI);
+        observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] }, syncLanguageUI);
+        syncLanguageUI();
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initStudio);
     else initStudio();
