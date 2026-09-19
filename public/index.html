@@ -45,6 +45,19 @@
                     <a href="#cardsSection">کتابخانه</a>
                 </nav>
                 <div class="header-actions">
+                    <button class="btn-icon language-toggle" id="btnLanguageToggle" data-language-toggle type="button">
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            aria-hidden="true"
+                        >
+                            <circle cx="12" cy="12" r="9" />
+                            <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />
+                        </svg>
+                        <span data-language-toggle-label>EN</span>
+                    </button>
                     <button class="btn-icon theme-toggle" id="btnThemeToggle" title="تغییر تم">
                         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="5" />
@@ -1167,6 +1180,13 @@
 
         <section id="storageSetup" class="storage-screen" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
             <div class="storage-panel">
+                <button class="language-toggle storage-language-toggle" data-language-toggle type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />
+                    </svg>
+                    <span data-language-toggle-label>EN</span>
+                </button>
                 <span class="storage-symbol" aria-hidden="true">✦</span>
                 <span class="storage-eyebrow">خانهٔ تازهٔ واژه‌هایت</span>
                 <h1 id="setupTitle">یادگیری‌ات را همراه بیاور</h1>

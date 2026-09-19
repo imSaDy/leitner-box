@@ -4,6 +4,9 @@ export function install(ctx) {
         loadReviewMode: function loadReviewMode() {
             ctx.currentReviewMode = ctx.preferences.reviewMode;
         },
+        loadLanguage: function loadLanguage() {
+            ctx.i18n.setLanguage(ctx.preferences.language, { emit: false });
+        },
         setReviewMode: async function setReviewMode(mode) {
             ctx.preferences.reviewMode = ctx.REVIEW_MODES.includes(mode) ? mode : 'flashcard';
             await ctx.saveData();

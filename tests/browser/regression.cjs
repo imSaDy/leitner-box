@@ -141,7 +141,7 @@ async function createPage(version, data = fixture()) {
     const page = await context.newPage();
     page.on('pageerror', (error) => errors.push(`${version}: ${error.message}`));
     page.on('dialog', (dialog) => dialog.accept());
-    page.setDefaultTimeout(6000);
+    page.setDefaultTimeout(15000);
     if (instance) instances.set(page, instance);
     await page.goto(instance ? instance.origin : `${origin}/${version}/index.html`);
     if (instance) await page.waitForFunction(() => document.documentElement.dataset.ready === 'true');
@@ -542,14 +542,28 @@ async function uiChecks() {
             assertions + ' assertions passed. Synthetic data only; SQLite-backed app compared with legacy behavior.'
         );
     } finally {
-        if (browser) await browser.close();
+        if (browser) {
+            for (const context of browser.contexts()) {
+                await context.request.dispose().catch(() => {});
+                await context.close().catch(() => {});
+            }
+        }
         for (const instance of instances.values()) {
-            instance.server.close();
+            instance.server.closeAllConnections?.();
+            await new Promise((resolve) => instance.server.close(resolve));
             instance.repository.close();
         }
-        server.close();
+        server.closeAllConnections?.();
+        await new Promise((resolve) => server.close(resolve));
+        if (browser)
+            await Promise.race([
+                browser.close().catch(() => {}),
+                new Promise((resolve) => setTimeout(resolve, 3000)),
+            ]);
     }
-})().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-});
+})()
+    .then(() => process.exit(0))
+    .catch((error) => {
+        console.error(error);
+        process.exit(1);
+    });

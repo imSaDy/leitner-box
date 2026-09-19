@@ -60,7 +60,12 @@ test('migration preserves every card field, history, extra metadata and preferen
     const reopened = new LeitnerRepository(r.dataDir);
     try {
         assert.deepEqual(reopened.read().state, state);
-        assert.deepEqual(reopened.read().preferences, { theme: 'light', reviewMode: 'combined', combinedBatchSize: 4 });
+        assert.deepEqual(reopened.read().preferences, {
+            theme: 'light',
+            reviewMode: 'combined',
+            combinedBatchSize: 4,
+            language: 'fa',
+        });
         assert.deepEqual(
             JSON.parse(reopened.db.prepare('SELECT payload FROM migration_archive').get().payload),
             payload

@@ -288,14 +288,16 @@ const check = (value, message) => {
     } finally {
         for (const resource of resources) await resource.context.request.dispose();
         await Promise.all(resources.map((resource) => resource.context.close()));
-        await browser.close();
         for (const resource of resources) {
             resource.server.closeAllConnections();
             await new Promise((resolve) => resource.server.close(resolve));
             resource.repository.close();
         }
+        await Promise.race([browser.close().catch(() => {}), new Promise((resolve) => setTimeout(resolve, 3000))]);
     }
-})().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-});
+})()
+    .then(() => process.exit(0))
+    .catch((error) => {
+        console.error(error);
+        process.exit(1);
+    });

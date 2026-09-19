@@ -38,6 +38,7 @@
         radial-gradient(ellipse at 90% 80%, #20c9b533, transparent 55%), #101323;
 }
 .storage-panel {
+    position: relative;
     width: min(100%, 620px);
     margin: auto;
     padding: clamp(24px, 5vw, 46px);
@@ -46,6 +47,21 @@
     background: #1c2037;
     color: #f3f1ff;
     box-shadow: 0 32px 100px #0005;
+}
+.storage-language-toggle {
+    position: absolute;
+    inset-block-start: 22px;
+    inset-inline-end: 22px;
+    min-height: 36px;
+    border: 1px solid #ffffff24;
+    border-radius: 11px;
+    background: #ffffff0c;
+    color: #ded9ff;
+    cursor: pointer;
+}
+.storage-language-toggle svg {
+    width: 16px;
+    height: 16px;
 }
 .storage-symbol {
     display: block;

@@ -14,7 +14,8 @@ export function installBackupUI(ctx) {
                 const button = document.createElement('button');
                 button.className = 'backup-item';
                 button.type = 'button';
-                button.textContent = `${new Date(item.createdAt).toLocaleString('fa-IR')} · دریافت نسخه`;
+                const locale = document.documentElement.lang === 'en' ? 'en-US' : 'fa-IR';
+                button.textContent = `${new Date(item.createdAt).toLocaleString(locale)} · دریافت نسخه`;
                 button.addEventListener('click', async () => {
                     try {
                         downloadJson(await api.request('/api/backups/' + encodeURIComponent(item.name)), item.name);
@@ -24,8 +25,9 @@ export function installBackupUI(ctx) {
                 });
                 list.append(button);
             }
+            const locale = document.documentElement.lang === 'en' ? 'en-US' : 'fa-IR';
             info.textContent = result.backups.length
-                ? `${result.backups.length.toLocaleString('fa-IR')} نسخهٔ پشتیبان موجود است.`
+                ? `${result.backups.length.toLocaleString(locale)} نسخهٔ پشتیبان موجود است.`
                 : 'اولین نسخهٔ پشتیبان را بسازید.';
         } catch (error) {
             info.textContent = error.message;
@@ -56,7 +58,7 @@ export function installBackupUI(ctx) {
             const draft = decodeImport(payload);
             if (
                 !confirm(
-                    `بازیابی ${draft.state.cards.length.toLocaleString('fa-IR')} کارت و سابقهٔ مرور؟ اطلاعات فعلی جایگزین می‌شود و قبل از آن یک نسخهٔ پشتیبان ساخته خواهد شد.`
+                    `بازیابی ${draft.state.cards.length.toLocaleString(document.documentElement.lang === 'en' ? 'en-US' : 'fa-IR')} کارت و سابقهٔ مرور؟ اطلاعات فعلی جایگزین می‌شود و قبل از آن یک نسخهٔ پشتیبان ساخته خواهد شد.`
                 )
             )
                 return;

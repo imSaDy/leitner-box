@@ -27,7 +27,8 @@ export async function ensureInitialized(repository) {
         try {
             const decoded = decodeImport(payload);
             candidate = { payload, decoded };
-            description.textContent = `${decoded.state.cards.length.toLocaleString('fa-IR')} کارت به همراه سابقهٔ مرور آمادهٔ انتقال است. نسخهٔ قبلی پاک نمی‌شود.`;
+            const locale = document.documentElement.lang === 'en' ? 'en-US' : 'fa-IR';
+            description.textContent = `${decoded.state.cards.length.toLocaleString(locale)} کارت به همراه سابقهٔ مرور آمادهٔ انتقال است. نسخهٔ قبلی پاک نمی‌شود.`;
             importButton.hidden = false;
             error.textContent = '';
         } catch (e) {

@@ -19,12 +19,15 @@ import { installTransactions } from './services/transactions.js';
 import { installStorageUI, downloadJson } from './ui/storage-ui.js';
 import { installBackupUI } from './ui/backups.js';
 import { decodeImport, emptyState } from '../shared/validation.js';
+import { createI18n } from './i18n.js';
 
 async function start() {
     const repository = new Persistence();
     installStorageUI(repository);
     try {
         await repository.load();
+        const i18n = createI18n(repository.snapshot.preferences.language);
+        i18n.start();
         const { seed } = await ensureInitialized(repository);
         const ctx = {};
         for (const install of [
@@ -46,13 +49,17 @@ async function start() {
         ])
             install(ctx);
         ctx.repository = repository;
+        ctx.i18n = i18n;
         ctx.appData = { ...emptyState(), ...structuredClone(repository.snapshot.state) };
         ctx.appData.stats = { ...emptyState().stats, ...ctx.appData.stats };
         ctx.preferences = structuredClone(repository.snapshot.preferences);
+        const languageNeedsSave = ctx.preferences.language !== i18n.language;
+        ctx.preferences.language = i18n.language;
         ctx.downloadJson = downloadJson;
         ctx.decodeImport = decodeImport;
         installTransactions(ctx);
         ctx.loadTheme();
+        ctx.loadLanguage();
         ctx.loadReviewMode();
         ctx.loadCombinedReviewBatchSize();
         ctx.bindEvents();
@@ -62,6 +69,21 @@ async function start() {
         ctx.updateDashboard();
         ctx.renderCards();
         installBackupUI(ctx);
+        let languageSave = Promise.resolve();
+        i18n.onChange((language) => {
+            languageSave = languageSave
+                .then(async () => {
+                    ctx.preferences.language = language;
+                    await ctx.saveData();
+                    ctx.updateDashboard();
+                    ctx.populateCategoryFilter();
+                    ctx.renderCards();
+                    i18n.apply();
+                })
+                .catch((error) => ctx.showToast(error.message || 'Language preference was not saved.', 'error'));
+            return languageSave;
+        });
+        if (languageNeedsSave) await ctx.saveData();
         if (seed)
             await ctx.runMutation(async () => {
                 await ctx.upsertFixedExpressionEntries(ctx.getEmbeddedFixedExpressionEntries(), true);

@@ -75,6 +75,13 @@ body {
     line-height: 1.6;
     position: relative;
 }
+html[data-language='en'] body,
+html[data-language='en'] button,
+html[data-language='en'] input,
+html[data-language='en'] textarea,
+html[data-language='en'] select {
+    font-family: var(--font-en);
+}
 
 /* --- Background --- */
 .bg-particles {
@@ -288,6 +295,21 @@ body {
     color: var(--text-primary);
     border-color: var(--border-light);
     transform: translateY(-1px);
+}
+.language-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 54px;
+    padding-inline: 9px;
+    font-family: var(--font-en);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+}
+.language-toggle span {
+    line-height: 1;
 }
 
 .btn-primary {

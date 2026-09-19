@@ -686,6 +686,14 @@ select:focus-visible,
     font: 10px var(--font-fa);
     margin-inline-start: 7px;
 }
+html[data-language='en'] .box-count {
+    text-align: left;
+    font-family: var(--font-en);
+}
+html[data-language='en'] .box-count::after {
+    content: 'cards';
+    font-family: var(--font-en);
+}
 .box-progress {
     height: 3px;
     background: var(--border-subtle);
@@ -1670,6 +1678,14 @@ kbd,
     .btn-icon {
         width: 32px;
         height: 36px;
+    }
+    .header-actions .language-toggle {
+        width: 38px;
+        min-width: 38px;
+        padding-inline: 0;
+    }
+    .header-actions .language-toggle svg {
+        display: none;
     }
     .btn-icon svg {
         width: 16px;

@@ -75,15 +75,22 @@ export function validateState(state) {
 
 export function validatePreferences(preferences) {
     if (!record(preferences)) fail('تنظیمات معتبر نیست.');
-    const allowed = new Set(['theme', 'reviewMode', 'combinedBatchSize']);
+    const allowed = new Set(['theme', 'reviewMode', 'combinedBatchSize', 'language']);
     if (Object.keys(preferences).some((key) => !allowed.has(key))) fail('تنظیم ناشناخته است.');
     if (!['dark', 'light'].includes(preferences.theme)) fail('تم معتبر نیست.');
     if (!['flashcard', 'typing', 'combined'].includes(preferences.reviewMode)) fail('روش مرور معتبر نیست.');
     integer(preferences.combinedBatchSize, 'اندازهٔ بسته', 1, 50);
+    if (preferences.language === undefined) preferences.language = 'fa';
+    if (!['fa', 'en'].includes(preferences.language)) fail('زبان معتبر نیست.');
     return preferences;
 }
 
-export const defaultPreferences = () => ({ theme: 'dark', reviewMode: 'flashcard', combinedBatchSize: 10 });
+export const defaultPreferences = () => ({
+    theme: 'dark',
+    reviewMode: 'flashcard',
+    combinedBatchSize: 10,
+    language: 'fa',
+});
 export const emptyState = () => ({
     cards: [],
     customCategories: [],

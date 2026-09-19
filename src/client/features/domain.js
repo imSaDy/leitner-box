@@ -5,17 +5,21 @@ export function install(ctx) {
             return crypto.randomUUID();
         },
         toPersianNumber: function toPersianNumber(num) {
+            if (document.documentElement.lang === 'en') return Number(num).toLocaleString('en-US');
             const pd = '۰۱۲۳۴۵۶۷۸۹';
             return num.toString().replace(/\d/g, (d) => pd[d]);
         },
         formatDate: function formatDate(dateStr) {
             if (!dateStr) return '';
             try {
-                return new Date(dateStr).toLocaleDateString('fa-IR', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                });
+                return new Date(dateStr).toLocaleDateString(
+                    document.documentElement.lang === 'en' ? 'en-US' : 'fa-IR',
+                    {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                    }
+                );
             } catch {
                 return new Date(dateStr).toLocaleDateString();
             }

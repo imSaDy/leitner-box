@@ -3,20 +3,22 @@
     'use strict';
     function initStudio() {
         const $ = (id) => document.getElementById(id);
-        const fa = (value) => Number(value).toLocaleString('fa-IR');
+        const fa = (value) => Number(value).toLocaleString(document.documentElement.lang === 'en' ? 'en-US' : 'fa-IR');
         const observe = (element, options, callback) => {
             const observer = new MutationObserver(callback);
             observer.observe(element, options);
             return observer;
         };
-        const today = new Date();
-        $('todayDate').dateTime =
-            `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-        $('todayDate').textContent = today.toLocaleDateString('fa-IR', {
-            weekday: 'long',
-            day: 'numeric',
-            month: 'long',
-        });
+        function renderToday() {
+            const today = new Date();
+            $('todayDate').dateTime =
+                `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            $('todayDate').textContent = today.toLocaleDateString(
+                document.documentElement.lang === 'en' ? 'en-US' : 'fa-IR',
+                { weekday: 'long', day: 'numeric', month: 'long' }
+            );
+        }
+        renderToday();
 
         // Delegate the welcome action to an existing review button. Its disabled
         // state is the authority; this layer never computes which cards are due.
@@ -282,6 +284,13 @@
             { passive: true }
         );
         syncNavigation();
+        document.addEventListener('leitner-language-change', () => {
+            renderToday();
+            syncWelcome();
+            syncModes();
+            filterTopics();
+            syncLibrary();
+        });
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initStudio);
     else initStudio();
