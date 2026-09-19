@@ -1,0 +1,37 @@
+{
+    "name": "leitner-box",
+    "version": "2.0.0",
+    "private": true,
+    "description": "A Persian-first desktop Leitner box with local transactional SQLite storage",
+    "main": "src/server/index.js",
+    "engines": {
+        "node": ">=24.11.0"
+    },
+    "scripts": {
+        "start": "node --disable-warning=ExperimentalWarning src/server/index.js",
+        "dev": "node scripts/dev.js",
+        "test": "npm run test:server && npm run test:browser",
+        "test:server": "node --disable-warning=ExperimentalWarning --test tests/unit/*.test.js tests/integration/*.test.js",
+        "test:browser": "node --disable-warning=ExperimentalWarning tests/browser/regression.cjs && node --disable-warning=ExperimentalWarning tests/browser/storage.cjs",
+        "check": "eslint src scripts tests/unit tests/integration tests/browser",
+        "format": "prettier --write src public/*.html public/styles/*.css scripts tests/unit tests/integration tests/browser",
+        "backup": "node --disable-warning=ExperimentalWarning scripts/backup.js"
+    },
+    "keywords": [
+        "leitner",
+        "spaced-repetition",
+        "flashcards",
+        "sqlite",
+        "persian"
+    ],
+    "author": "imSaDy",
+    "license": "ISC",
+    "type": "module",
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "@playwright/test": "^1.63.0",
+        "eslint": "^10.10.0",
+        "globals": "^17.12.0",
+        "prettier": "^3.9.6"
+    }
+}

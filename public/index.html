@@ -1,0 +1,1246 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>جعبه لایتنر | Leitner Box - مرور لغات انگلیسی</title>
+        <meta
+            name="description"
+            content="اپلیکیشن جعبه لایتنر برای یادگیری و مرور لغات انگلیسی با سیستم مرور فاصله‌دار"
+        />
+        <link rel="preconnect" href="https://translate.google.com" />
+        <link rel="dns-prefetch" href="//translate.google.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="icon" type="image/png" href="leitner-box-icon-v2.png" />
+        <link rel="stylesheet" href="/styles/base.css" />
+        <link rel="stylesheet" href="/styles/studio.css" />
+        <link rel="stylesheet" href="/styles/storage.css" />
+        <link rel="icon" href="/assets/icon.ico" />
+    </head>
+    <body>
+        <a class="skip-link" href="#cardsSection">رفتن به کتابخانهٔ کارت‌ها</a>
+        <!-- Background particles -->
+        <div class="bg-particles" id="bgParticles"></div>
+
+        <!-- Header -->
+        <header class="app-header" id="appHeader">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <img src="/assets/leitner-box-icon-v2.png" alt="" aria-hidden="true" />
+                    </div>
+                    <div class="logo-text">
+                        <h1>جعبه لایتنر</h1>
+                        <span class="logo-subtitle">Leitner Box</span>
+                    </div>
+                </div>
+                <nav class="workspace-nav" aria-label="بخش‌های برنامه">
+                    <a class="active" href="#studyDesk" aria-current="location">میز مطالعه</a>
+                    <a href="#categoryReviewSection">موضوع‌ها</a>
+                    <a href="#cardsSection">کتابخانه</a>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn-icon theme-toggle" id="btnThemeToggle" title="تغییر تم">
+                        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5" />
+                            <line x1="12" y1="1" x2="12" y2="3" />
+                            <line x1="12" y1="21" x2="12" y2="23" />
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                            <line x1="1" y1="12" x2="3" y2="12" />
+                            <line x1="21" y1="12" x2="23" y2="12" />
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                        </svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+                        </svg>
+                    </button>
+                    <button class="btn-icon" id="btnExport" title="پشتیبان‌گیری و ورود داده‌ها">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                    </button>
+                    <button class="btn-icon" id="btnStats" title="آمار">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 20V10" />
+                            <path d="M12 20V4" />
+                            <path d="M6 20v-6" />
+                        </svg>
+                    </button>
+                    <button class="btn-primary" id="btnAddCard">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                        <span>کارت جدید</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content" id="studyDesk">
+            <section class="study-welcome" aria-labelledby="welcomeTitle">
+                <div class="welcome-topline">
+                    <span class="eyebrow"><span class="status-dot"></span> فضای شخصی یادگیری</span>
+                    <time class="today-date" id="todayDate"></time>
+                </div>
+                <div class="welcome-layout">
+                    <div class="welcome-copy">
+                        <h2 id="welcomeTitle">هر مرور،<br />یک قدم <em>ماندگار.</em></h2>
+                        <p id="studyMessage">کمی تمرین امروز، ماندگاری بیشتر فردا.</p>
+                        <div class="welcome-actions">
+                            <button class="btn-primary study-start" id="btnStudyStart" type="button" disabled>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="m9 5 9 7-9 7V5Z" />
+                                </svg>
+                                <span id="studyStartLabel">آماده‌سازی مرور…</span>
+                            </button>
+                            <a class="text-link" href="#cardsSection"
+                                >رفتن به کتابخانه <span aria-hidden="true">←</span></a
+                            >
+                        </div>
+                        <span class="study-caption" id="studyCaption">مرور با همان زمان‌بندی شخصی شما</span>
+                    </div>
+                    <div class="memory-art" aria-hidden="true" dir="ltr">
+                        <span class="art-orbit orbit-one"></span><span class="art-orbit orbit-two"></span>
+                        <span class="art-spark spark-one">✦</span><span class="art-spark spark-two">+</span>
+                        <div class="paper-card paper-back"></div>
+                        <div class="paper-card paper-middle"></div>
+                        <div class="paper-card paper-front">
+                            <div class="paper-top"><span>THE DAILY PRACTICE</span><span>↗</span></div>
+                            <div class="paper-word">make it<br /><i>stick.</i></div>
+                            <div class="paper-line"></div>
+                            <span class="paper-meaning" dir="rtl">یاد بگیر. مرور کن. به خاطر بسپار.</span>
+                            <div class="paper-bottom"><span>LEITNER METHOD</span><span>01 — 05</span></div>
+                        </div>
+                        <div class="memory-tag"><span>✓</span> Small steps. Lasting progress.</div>
+                    </div>
+                </div>
+                <div class="header-stats" id="headerStats">
+                    <div class="stat-pill" id="statTotal">
+                        <span class="metric-symbol" aria-hidden="true"
+                            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                                <rect x="7" y="3" width="13" height="16" rx="3" />
+                                <path d="M16 21H6a3 3 0 0 1-3-3V7M11 8h5M11 12h3" /></svg
+                        ></span>
+                        <div>
+                            <span class="stat-value" id="totalCards">0</span
+                            ><span class="stat-label">کارت در کتابخانه</span>
+                        </div>
+                        <span class="metric-note">گنجینهٔ واژه‌های شما</span>
+                    </div>
+                    <div class="stat-pill" id="statDue">
+                        <span class="metric-symbol" aria-hidden="true"
+                            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                                <circle cx="12" cy="12" r="9" />
+                                <path d="M12 7v5l3 2" /></svg
+                        ></span>
+                        <div>
+                            <span class="stat-value" id="dueCards">0</span
+                            ><span class="stat-label">کارت آمادهٔ مرور</span>
+                        </div>
+                        <span class="metric-note">فرصت یادگیری امروز</span>
+                    </div>
+                    <div class="stat-pill" id="statMastered">
+                        <span class="metric-symbol" aria-hidden="true"
+                            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                                <path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3Z" />
+                                <path d="m8 12 3 3 5-6" /></svg
+                        ></span>
+                        <div>
+                            <span class="stat-value" id="masteredCards">0</span
+                            ><span class="stat-label">کارت در جعبهٔ تسلط</span>
+                        </div>
+                        <span class="metric-note">حاصل استمرار شما</span>
+                    </div>
+                </div>
+            </section>
+            <!-- Boxes Section -->
+            <section class="boxes-section" id="boxesSection">
+                <div class="section-header section-header-action">
+                    <div>
+                        <h2><span class="section-index">۰۱</span> مسیر یادگیری</h2>
+                        <p>کارت‌ها بر اساس پیشرفت شما بین جعبه‌ها جابجا می‌شوند</p>
+                    </div>
+                    <div class="review-settings">
+                        <div class="review-mode-toggle" id="reviewModeToggle" aria-label="روش مرور">
+                            <button
+                                class="mode-option active"
+                                id="btnReviewModeFlashcard"
+                                data-review-mode="flashcard"
+                                type="button"
+                            >
+                                کارت
+                            </button>
+                            <button
+                                class="mode-option"
+                                id="btnReviewModeTyping"
+                                data-review-mode="typing"
+                                type="button"
+                            >
+                                تایپ انگلیسی
+                            </button>
+                            <button
+                                class="mode-option"
+                                id="btnReviewModeCombined"
+                                data-review-mode="combined"
+                                type="button"
+                            >
+                                ترکیبی
+                            </button>
+                        </div>
+                        <label
+                            class="combined-batch-setting"
+                            for="combinedBatchSizeInput"
+                            title="تعداد کارت‌هایی که قبل از تمرین تایپی در مرور ترکیبی نمایش داده می‌شود"
+                        >
+                            <span>بسته ترکیبی</span>
+                            <input
+                                type="number"
+                                id="combinedBatchSizeInput"
+                                min="1"
+                                max="50"
+                                step="1"
+                                inputmode="numeric"
+                                value="10"
+                            />
+                        </label>
+                    </div>
+                </div>
+                <p class="mode-explainer" id="modeExplainer" aria-live="polite">
+                    کارت را ببینید، پاسخ را به یاد بیاورید و خودتان ارزیابی کنید.
+                </p>
+                <div class="boxes-grid" id="boxesGrid">
+                    <div class="leitner-box" data-box="1" id="box1">
+                        <div class="box-glow"></div>
+                        <div class="box-header">
+                            <div class="box-number">۱</div>
+                            <div class="box-info">
+                                <h3>جعبه اول</h3>
+                                <span class="box-schedule">هر روز</span>
+                            </div>
+                            <div class="box-count" id="box1Count">0</div>
+                        </div>
+                        <div class="box-progress"><div class="progress-bar" id="box1Progress"></div></div>
+                        <div class="box-due" id="box1Due"><span class="due-badge">0 کارت آماده مرور</span></div>
+                        <button class="box-review-btn" data-box="1" id="reviewBox1">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3" />
+                            </svg>
+                            شروع مرور
+                        </button>
+                    </div>
+                    <div class="leitner-box" data-box="2" id="box2">
+                        <div class="box-glow"></div>
+                        <div class="box-header">
+                            <div class="box-number">۲</div>
+                            <div class="box-info">
+                                <h3>جعبه دوم</h3>
+                                <span class="box-schedule">هر ۲ روز</span>
+                            </div>
+                            <div class="box-count" id="box2Count">0</div>
+                        </div>
+                        <div class="box-progress"><div class="progress-bar" id="box2Progress"></div></div>
+                        <div class="box-due" id="box2Due"><span class="due-badge">0 کارت آماده مرور</span></div>
+                        <button class="box-review-btn" data-box="2" id="reviewBox2">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3" />
+                            </svg>
+                            شروع مرور
+                        </button>
+                    </div>
+                    <div class="leitner-box" data-box="3" id="box3">
+                        <div class="box-glow"></div>
+                        <div class="box-header">
+                            <div class="box-number">۳</div>
+                            <div class="box-info">
+                                <h3>جعبه سوم</h3>
+                                <span class="box-schedule">هر ۵ روز</span>
+                            </div>
+                            <div class="box-count" id="box3Count">0</div>
+                        </div>
+                        <div class="box-progress"><div class="progress-bar" id="box3Progress"></div></div>
+                        <div class="box-due" id="box3Due"><span class="due-badge">0 کارت آماده مرور</span></div>
+                        <button class="box-review-btn" data-box="3" id="reviewBox3">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3" />
+                            </svg>
+                            شروع مرور
+                        </button>
+                    </div>
+                    <div class="leitner-box" data-box="4" id="box4">
+                        <div class="box-glow"></div>
+                        <div class="box-header">
+                            <div class="box-number">۴</div>
+                            <div class="box-info">
+                                <h3>جعبه چهارم</h3>
+                                <span class="box-schedule">هر ۱۴ روز</span>
+                            </div>
+                            <div class="box-count" id="box4Count">0</div>
+                        </div>
+                        <div class="box-progress"><div class="progress-bar" id="box4Progress"></div></div>
+                        <div class="box-due" id="box4Due"><span class="due-badge">0 کارت آماده مرور</span></div>
+                        <button class="box-review-btn" data-box="4" id="reviewBox4">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3" />
+                            </svg>
+                            شروع مرور
+                        </button>
+                    </div>
+                    <div class="leitner-box box-mastered" data-box="5" id="box5">
+                        <div class="box-glow"></div>
+                        <div class="box-header">
+                            <div class="box-number">۵</div>
+                            <div class="box-info">
+                                <h3>تسلط یافته</h3>
+                                <span class="box-schedule">هر ۳۰ روز</span>
+                            </div>
+                            <div class="box-count" id="box5Count">0</div>
+                        </div>
+                        <div class="box-progress"><div class="progress-bar" id="box5Progress"></div></div>
+                        <div class="box-due" id="box5Due"><span class="due-badge">0 کارت آماده مرور</span></div>
+                        <button class="box-review-btn" data-box="5" id="reviewBox5">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3" />
+                            </svg>
+                            شروع مرور
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic Review Section -->
+            <section class="category-review-section" id="categoryReviewSection">
+                <div class="section-header section-header-action">
+                    <div>
+                        <h2>
+                            <span class="section-index">۰۲</span> مرور موضوعی
+                            <span class="section-count" id="topicCount"></span>
+                        </h2>
+                        <p>کارت‌های آماده مرور را بر اساس موضوع تمرین کنید</p>
+                    </div>
+                    <div class="search-box topic-search">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <circle cx="10.5" cy="10.5" r="7" />
+                            <path d="m16 16 4 4" />
+                        </svg>
+                        <input
+                            type="search"
+                            id="topicSearch"
+                            placeholder="پیدا کردن موضوع…"
+                            aria-label="جستجوی موضوع‌های مرور"
+                            dir="auto"
+                            autocomplete="off"
+                        />
+                    </div>
+                </div>
+                <div class="category-review-grid" id="categoryReviewList"></div>
+                <p class="topic-no-results" id="topicNoResults" hidden>موضوعی پیدا نشد؛ عبارت دیگری را امتحان کنید.</p>
+                <button
+                    class="topics-more"
+                    id="btnTopicsMore"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="categoryReviewList"
+                    hidden
+                >
+                    نمایش همهٔ موضوع‌ها <span aria-hidden="true">↓</span>
+                </button>
+            </section>
+
+            <!-- Cards List Section - Compact Table -->
+            <section class="cards-section" id="cardsSection">
+                <div class="section-header">
+                    <div class="library-heading">
+                        <div>
+                            <h2><span class="section-index">۰۳</span> کتابخانهٔ کارت‌ها</h2>
+                            <p>واژه‌ها، عبارت‌ها و جمله‌های شما، یک‌جا.</p>
+                        </div>
+                        <span class="library-page-count" id="libraryPageCount" aria-live="polite"></span>
+                    </div>
+                    <div class="cards-filter">
+                        <div class="search-box" id="searchBox">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8" />
+                                <path d="m21 21-4.3-4.3" />
+                            </svg>
+                            <input
+                                type="search"
+                                id="searchInput"
+                                placeholder="جستجوی واژه، معنی یا دسته…"
+                                aria-label="جستجوی کارت‌ها"
+                                dir="auto"
+                                autocomplete="off"
+                            />
+                            <kbd aria-hidden="true">/</kbd>
+                        </div>
+                        <div class="select-box category-filter-box">
+                            <select id="categoryFilter" aria-label="فیلتر دسته‌بندی">
+                                <option value="all">همه دسته‌ها</option>
+                            </select>
+                        </div>
+                        <button
+                            class="due-only-toggle"
+                            id="dueOnlyToggle"
+                            type="button"
+                            aria-pressed="false"
+                            title="نمایش فقط کارت‌های آماده مرور"
+                        >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 8a6 6 0 0112 0c0 7 3 7 3 9H3c0-2 3-2 3-9" />
+                                <path d="M10.3 21a2 2 0 003.4 0" />
+                            </svg>
+                            <span>آماده مرور</span>
+                        </button>
+                        <div class="filter-tabs" id="filterTabs">
+                            <button class="filter-tab active" data-filter="all">همه</button>
+                            <button class="filter-tab" data-filter="1">جعبه ۱</button>
+                            <button class="filter-tab" data-filter="2">جعبه ۲</button>
+                            <button class="filter-tab" data-filter="3">جعبه ۳</button>
+                            <button class="filter-tab" data-filter="4">جعبه ۴</button>
+                            <button class="filter-tab" data-filter="5">جعبه ۵</button>
+                        </div>
+                        <button class="clear-filters" id="btnClearFilters" type="button" hidden>
+                            پاک‌کردن فیلترها ×
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Empty state -->
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">
+                        <svg viewBox="0 0 80 80" fill="none">
+                            <rect
+                                x="10"
+                                y="20"
+                                width="40"
+                                height="30"
+                                rx="4"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-dasharray="5 5"
+                            />
+                            <rect
+                                x="20"
+                                y="14"
+                                width="40"
+                                height="30"
+                                rx="4"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-dasharray="5 5"
+                                opacity="0.6"
+                            />
+                            <rect
+                                x="30"
+                                y="8"
+                                width="40"
+                                height="30"
+                                rx="4"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-dasharray="5 5"
+                                opacity="0.3"
+                            />
+                        </svg>
+                    </div>
+                    <h3>هنوز کارتی اضافه نشده!</h3>
+                    <p>با کلیک روی دکمه «کارت جدید» اولین لغت خود را اضافه کنید</p>
+                    <button class="btn-primary btn-lg" id="btnAddCardEmpty">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                        <span>اضافه کردن کارت</span>
+                    </button>
+                </div>
+
+                <!-- Compact table -->
+                <div class="bulk-actions-bar" id="bulkActionsBar" style="display: none">
+                    <div class="bulk-selection-info">
+                        <span id="selectedCardsCount">۰ کارت انتخاب شده</span>
+                    </div>
+                    <div class="bulk-actions">
+                        <button class="btn-secondary" id="btnClearSelection" type="button">لغو انتخاب</button>
+                        <button class="btn-secondary bulk-move-btn" id="btnMoveSelectedPrev" type="button" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 12H5" />
+                                <path d="M12 19l-7-7 7-7" />
+                            </svg>
+                            جعبه قبلی
+                        </button>
+                        <button class="btn-secondary bulk-move-btn" id="btnMoveSelectedNext" type="button" disabled>
+                            جعبه بعدی
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14" />
+                                <path d="M12 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                        <button class="btn-danger" id="btnDeleteSelected" type="button" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            </svg>
+                            حذف انتخاب‌شده‌ها
+                        </button>
+                    </div>
+                </div>
+                <div class="cards-table-wrapper" id="cardsTableWrapper" style="display: none">
+                    <table class="cards-table" id="cardsTable">
+                        <thead>
+                            <tr>
+                                <th class="col-select">
+                                    <label class="table-checkbox" title="انتخاب کارت‌های این صفحه">
+                                        <input type="checkbox" id="selectPageCards" />
+                                        <span></span>
+                                    </label>
+                                </th>
+                                <th class="col-word">کلمه</th>
+                                <th class="col-phonetic">تلفظ</th>
+                                <th class="col-meaning">معنی</th>
+                                <th class="col-category">دسته</th>
+                                <th class="col-box">جعبه</th>
+                                <th class="col-status">وضعیت</th>
+                                <th class="col-actions">عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cardsTableBody"></tbody>
+                    </table>
+                    <!-- Pagination -->
+                    <div class="pagination" id="pagination">
+                        <button class="pagination-btn" id="btnPrevPage" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9 18 15 12 9 6" />
+                            </svg>
+                        </button>
+                        <div class="pagination-info">
+                            صفحه <span id="currentPage">1</span> از <span id="totalPages">1</span>
+                        </div>
+                        <button class="pagination-btn" id="btnNextPage" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="15 18 9 12 15 6" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Add/Edit Card Modal -->
+        <div class="modal-overlay" id="cardModal">
+            <div class="modal" id="cardModalContent">
+                <div class="modal-header">
+                    <h2 id="modalTitle">کارت جدید</h2>
+                    <button class="btn-close" id="btnCloseModal">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                    </button>
+                </div>
+                <form id="cardForm">
+                    <div class="form-group">
+                        <label>نوع کارت</label>
+                        <div class="card-type-toggle" id="cardTypeToggle" aria-label="نوع کارت">
+                            <button
+                                class="card-type-option active"
+                                id="btnCardTypeVocabulary"
+                                data-card-type="vocabulary"
+                                type="button"
+                            >
+                                کلمه / عبارت
+                            </button>
+                            <button
+                                class="card-type-option"
+                                id="btnCardTypeSentence"
+                                data-card-type="sentence"
+                                type="button"
+                            >
+                                جمله
+                            </button>
+                        </div>
+                        <input type="hidden" id="inputCardType" value="vocabulary" />
+                    </div>
+                    <div class="form-group" id="vocabularyWordGroup">
+                        <label for="inputWord">کلمه یا اصطلاح انگلیسی <span class="required">*</span></label>
+                        <div class="input-with-status">
+                            <input
+                                type="text"
+                                id="inputWord"
+                                dir="ltr"
+                                placeholder="e.g. Serendipity"
+                                required
+                                autocomplete="off"
+                            />
+                            <div class="input-status" id="wordStatus"></div>
+                        </div>
+                        <div class="auto-phonetic-hint" id="phoneticHint">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M12 16v-4" />
+                                <path d="M12 8h.01" />
+                            </svg>
+                            تلفظ فونتیک به‌صورت خودکار از اینترنت دریافت می‌شود
+                        </div>
+                    </div>
+                    <div class="form-group sentence-field" id="sentenceTextGroup" style="display: none">
+                        <label for="inputSentence">جمله انگلیسی <span class="required">*</span></label>
+                        <textarea
+                            id="inputSentence"
+                            dir="ltr"
+                            rows="4"
+                            placeholder="e.g. The committee postponed the vote until more evidence was available."
+                            autocomplete="off"
+                            disabled
+                        ></textarea>
+                    </div>
+                    <div class="form-group" id="vocabularyMeaningGroup">
+                        <label for="inputMeaning">معنی فارسی <span class="required">*</span></label>
+                        <input type="text" id="inputMeaning" dir="rtl" placeholder="مثلاً: خوش‌اقبالی" required />
+                    </div>
+                    <div class="form-group sentence-field" id="sentenceMeaningGroup" style="display: none">
+                        <label for="inputSentenceMeaning">معنی فارسی جمله <span class="required">*</span></label>
+                        <textarea
+                            id="inputSentenceMeaning"
+                            dir="rtl"
+                            rows="3"
+                            placeholder="ترجمه یا مفهوم فارسی جمله..."
+                            disabled
+                        ></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputCategory">دسته موضوعی <span class="required">*</span></label>
+                        <div class="category-combobox">
+                            <input
+                                type="text"
+                                id="inputCategory"
+                                list="categoryList"
+                                placeholder="انتخاب یا تایپ دسته جدید..."
+                                required
+                                autocomplete="off"
+                                dir="ltr"
+                            />
+                            <datalist id="categoryList"></datalist>
+                            <div class="category-new-hint" id="categoryNewHint" style="display: none">
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    style="width: 14px; height: 14px"
+                                >
+                                    <line x1="12" y1="5" x2="12" y2="19" />
+                                    <line x1="5" y1="12" x2="19" y2="12" />
+                                </svg>
+                                <span>دسته جدید ساخته خواهد شد</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group vocabulary-field" id="vocabularyExampleGroup">
+                        <label for="inputExample">جمله نمونه (اختیاری)</label>
+                        <textarea
+                            id="inputExample"
+                            dir="ltr"
+                            rows="3"
+                            placeholder="e.g. Finding that book was pure serendipity."
+                        ></textarea>
+                    </div>
+                    <div class="form-group sentence-field" id="sentenceHintGroup" style="display: none">
+                        <label for="inputSentenceHint">راهنمایی (اختیاری)</label>
+                        <textarea
+                            id="inputSentenceHint"
+                            dir="rtl"
+                            rows="2"
+                            placeholder="مثلاً: با although شروع می‌شود، یا زمان جمله past perfect است..."
+                            disabled
+                        ></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputNotes">یادداشت (اختیاری)</label>
+                        <textarea
+                            id="inputNotes"
+                            dir="rtl"
+                            rows="2"
+                            placeholder="یادداشت یا نکته‌ای برای حفظ بهتر..."
+                        ></textarea>
+                    </div>
+                    <input type="hidden" id="editCardId" value="" />
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="btnCancelModal">انصراف</button>
+                        <button type="submit" class="btn-primary" id="btnSaveCard">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                            <span>ذخیره کارت</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Review Mode Overlay -->
+        <div class="review-overlay" id="reviewOverlay">
+            <div class="review-header">
+                <div class="review-info">
+                    <button class="btn-back" id="btnExitReview">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6" />
+                        </svg>
+                        بازگشت
+                    </button>
+                    <div class="review-progress-info">
+                        <span id="reviewCurrent">1</span> از <span id="reviewTotal">10</span>
+                    </div>
+                </div>
+                <div class="review-progress-bar">
+                    <div class="review-progress-fill" id="reviewProgressFill"></div>
+                </div>
+            </div>
+
+            <div class="review-card-container">
+                <div class="review-card" id="reviewCard">
+                    <div class="review-card-inner" id="reviewCardInner">
+                        <!-- Front -->
+                        <div class="review-card-front">
+                            <div class="card-box-badge" id="reviewBoxBadge">جعبه ۱</div>
+                            <div class="card-category-badge" id="reviewCategoryBadge">General</div>
+                            <button class="btn-speak" id="btnSpeakFront" title="پخش تلفظ">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                    <path d="M19.07 4.93a10 10 0 010 14.14" />
+                                    <path d="M15.54 8.46a5 5 0 010 7.07" />
+                                </svg>
+                            </button>
+                            <div class="card-word" id="reviewWord">Word</div>
+                            <div class="card-pronunciation" id="reviewPronunciation">/wɜːrd/</div>
+                            <button class="card-tap-hint" id="btnRevealAnswer" type="button">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
+                                </svg>
+                                نمایش پاسخ <kbd>Space</kbd>
+                            </button>
+                        </div>
+                        <!-- Back -->
+                        <div class="review-card-back">
+                            <div class="card-box-badge" id="reviewBoxBadgeBack">جعبه ۱</div>
+                            <div class="card-category-badge" id="reviewCategoryBadgeBack">General</div>
+                            <button class="btn-speak" id="btnSpeakBack" title="پخش تلفظ">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                    <path d="M19.07 4.93a10 10 0 010 14.14" />
+                                    <path d="M15.54 8.46a5 5 0 010 7.07" />
+                                </svg>
+                            </button>
+                            <div class="card-word-small" id="reviewWordBack">Word</div>
+                            <div class="card-meaning" id="reviewMeaning">معنی</div>
+                            <div class="card-example" id="reviewExample">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path
+                                        d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"
+                                    />
+                                    <path
+                                        d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"
+                                    />
+                                </svg>
+                                <span id="reviewExampleText">Example sentence</span>
+                            </div>
+                            <div class="card-notes" id="reviewNotes">
+                                <span id="reviewNotesText">Notes</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="typing-review-container" id="typingReviewContainer" style="display: none">
+                <div class="typing-review-card">
+                    <div class="typing-badges">
+                        <span class="card-box-badge-inline" id="typingBoxBadge">جعبه ۱</span>
+                        <span class="card-category-badge-inline" id="typingCategoryBadge">General</span>
+                    </div>
+                    <div class="typing-prompt-label">معنی فارسی</div>
+                    <div class="typing-meaning" id="typingMeaning">معنی</div>
+                    <form class="typing-answer-form" id="typingAnswerForm">
+                        <input
+                            type="text"
+                            id="typingAnswerInput"
+                            dir="ltr"
+                            autocomplete="off"
+                            spellcheck="false"
+                            placeholder="English word"
+                        />
+                        <button class="btn-primary" id="btnCheckTypedAnswer" type="submit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                            <span>بررسی</span>
+                        </button>
+                    </form>
+                    <div class="typing-feedback" id="typingFeedback" aria-live="polite"></div>
+                    <div class="typing-hint" id="typingHint" aria-live="polite"></div>
+                    <div class="typing-reveal" id="typingReveal" style="display: none">
+                        <button class="btn-speak-inline" id="btnSpeakTyping" type="button" title="پخش تلفظ">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                <path d="M15.54 8.46a5 5 0 010 7.07" />
+                            </svg>
+                        </button>
+                        <div>
+                            <div class="typing-answer-word" id="typingAnswerWord">word</div>
+                            <div class="typing-answer-pronunciation" id="typingAnswerPronunciation">/wɜːrd/</div>
+                        </div>
+                    </div>
+                    <div class="typing-example" id="typingExample" style="display: none"></div>
+                    <div class="typing-buttons">
+                        <button class="btn-secondary" id="btnGiveUpTyping" type="button">بلد نیستم</button>
+                        <button
+                            class="btn-secondary btn-edit-typing"
+                            id="btnEditDuringTyping"
+                            type="button"
+                            title="ویرایش این کارت"
+                        >
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                style="width: 16px; height: 16px; vertical-align: middle; margin-left: 4px"
+                            >
+                                <path d="M12 20h9" />
+                                <path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z" />
+                            </svg>
+                            ویرایش کارت
+                        </button>
+                        <button
+                            class="btn-secondary btn-delete-typing"
+                            id="btnDeleteDuringTyping"
+                            type="button"
+                            title="حذف این کارت"
+                        >
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                style="width: 16px; height: 16px; vertical-align: middle; margin-left: 4px"
+                            >
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            </svg>
+                            حذف کارت
+                        </button>
+                        <button class="btn-primary" id="btnNextTypedCard" type="button" style="display: none">
+                            <span>کارت بعدی</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sentence-review-container" id="sentenceReviewContainer" style="display: none">
+                <div class="sentence-review-card">
+                    <div class="typing-badges">
+                        <span class="card-box-badge-inline" id="sentenceBoxBadge">جعبه ۱</span>
+                        <span class="card-category-badge-inline" id="sentenceCategoryBadge">General</span>
+                    </div>
+                    <div class="sentence-prompt-block">
+                        <div class="typing-prompt-label">معنی فارسی</div>
+                        <div class="sentence-meaning" id="sentenceReviewMeaning">معنی جمله</div>
+                    </div>
+                    <form class="sentence-answer-form" id="sentenceAnswerForm">
+                        <textarea
+                            id="sentenceAnswerInput"
+                            dir="ltr"
+                            autocomplete="off"
+                            spellcheck="false"
+                            placeholder="Type the full English sentence"
+                        ></textarea>
+                        <button class="btn-primary" id="btnCheckSentenceAnswer" type="submit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                            <span>بررسی</span>
+                        </button>
+                    </form>
+                    <div class="sentence-feedback" id="sentenceFeedback" aria-live="polite"></div>
+                    <div
+                        class="sentence-hint-panel"
+                        id="sentenceHintPanel"
+                        style="display: none"
+                        aria-live="polite"
+                    ></div>
+                    <div class="sentence-reveal" id="sentenceReveal" style="display: none">
+                        <button class="btn-speak-inline" id="btnSpeakSentence" type="button" title="پخش جمله">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                <path d="M15.54 8.46a5 5 0 010 7.07" />
+                            </svg>
+                        </button>
+                        <div class="sentence-correct-answer" id="sentenceCorrectAnswer">English sentence</div>
+                    </div>
+                    <div class="sentence-notes-review" id="sentenceNotesReview" style="display: none"></div>
+                    <div class="sentence-buttons">
+                        <button class="btn-secondary" id="btnShowSentenceHint" type="button">راهنمایی</button>
+                        <button class="btn-secondary" id="btnGiveUpSentence" type="button">بلد نیستم</button>
+                        <button
+                            class="btn-secondary btn-edit-typing"
+                            id="btnEditDuringSentence"
+                            type="button"
+                            title="ویرایش این کارت"
+                        >
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                style="width: 16px; height: 16px; vertical-align: middle; margin-left: 4px"
+                            >
+                                <path d="M12 20h9" />
+                                <path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z" />
+                            </svg>
+                            ویرایش کارت
+                        </button>
+                        <button
+                            class="btn-secondary btn-delete-typing"
+                            id="btnDeleteDuringSentence"
+                            type="button"
+                            title="حذف این کارت"
+                        >
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                style="width: 16px; height: 16px; vertical-align: middle; margin-left: 4px"
+                            >
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            </svg>
+                            حذف کارت
+                        </button>
+                        <button class="btn-primary" id="btnNextSentenceCard" type="button" style="display: none">
+                            <span>کارت بعدی</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="review-actions" id="reviewActions" style="display: none">
+                <button class="review-btn review-btn-edit" id="btnEditDuringReview" title="ویرایش این کارت">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z" />
+                    </svg>
+                    <span>ویرایش کارت</span>
+                </button>
+                <button class="review-btn review-btn-delete" id="btnDeleteDuringReview" title="حذف این کارت">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                        <line x1="10" y1="11" x2="10" y2="17" />
+                        <line x1="14" y1="11" x2="14" y2="17" />
+                    </svg>
+                    <span>حذف کارت</span>
+                </button>
+                <button class="review-btn review-btn-wrong" id="btnWrong">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                    <span>بلد نبودم</span>
+                    <small>برگشت به جعبه ۱</small>
+                </button>
+                <button class="review-btn review-btn-correct" id="btnCorrect">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span>بلد بودم</span>
+                    <small>رفتن به جعبه بعدی</small>
+                </button>
+            </div>
+
+            <!-- Review Complete -->
+            <div class="review-complete" id="reviewComplete" style="display: none">
+                <div class="complete-icon">🎉</div>
+                <h2>آفرین! مرور تمام شد</h2>
+                <div class="complete-stats">
+                    <div class="complete-stat correct">
+                        <span class="complete-stat-value" id="completeCorrect">0</span>
+                        <span class="complete-stat-label">درست</span>
+                    </div>
+                    <div class="complete-stat wrong">
+                        <span class="complete-stat-value" id="completeWrong">0</span>
+                        <span class="complete-stat-label">نادرست</span>
+                    </div>
+                    <div class="complete-stat accuracy">
+                        <span class="complete-stat-value" id="completeAccuracy">0%</span>
+                        <span class="complete-stat-label">دقت</span>
+                    </div>
+                </div>
+                <button class="btn-primary btn-lg" id="btnFinishReview">بازگشت به داشبورد</button>
+            </div>
+        </div>
+
+        <!-- Stats Modal -->
+        <div class="modal-overlay" id="statsModal">
+            <div class="modal modal-lg">
+                <div class="modal-header">
+                    <h2>📊 آمار و پیشرفت</h2>
+                    <button class="btn-close" id="btnCloseStats">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="stats-content">
+                    <div class="stats-overview">
+                        <div class="stat-card">
+                            <div class="stat-card-icon">📚</div>
+                            <div class="stat-card-value" id="statTotalCards">0</div>
+                            <div class="stat-card-label">کل کارت‌ها</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-icon">✅</div>
+                            <div class="stat-card-value" id="statTotalReviews">0</div>
+                            <div class="stat-card-label">کل مرورها</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-icon">🎯</div>
+                            <div class="stat-card-value" id="statAccuracy">0%</div>
+                            <div class="stat-card-label">دقت کل</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-icon">🔥</div>
+                            <div class="stat-card-value" id="statStreak">0</div>
+                            <div class="stat-card-label">روز متوالی</div>
+                        </div>
+                    </div>
+                    <div class="stats-chart">
+                        <h3>توزیع کارت‌ها در جعبه‌ها</h3>
+                        <div class="chart-bars" id="chartBars">
+                            <div class="chart-bar-group">
+                                <div class="chart-bar-wrapper">
+                                    <div class="chart-bar" data-box="1" id="chartBar1" style="height: 0%"></div>
+                                </div>
+                                <span class="chart-label">جعبه ۱</span
+                                ><span class="chart-value" id="chartValue1">0</span>
+                            </div>
+                            <div class="chart-bar-group">
+                                <div class="chart-bar-wrapper">
+                                    <div class="chart-bar" data-box="2" id="chartBar2" style="height: 0%"></div>
+                                </div>
+                                <span class="chart-label">جعبه ۲</span
+                                ><span class="chart-value" id="chartValue2">0</span>
+                            </div>
+                            <div class="chart-bar-group">
+                                <div class="chart-bar-wrapper">
+                                    <div class="chart-bar" data-box="3" id="chartBar3" style="height: 0%"></div>
+                                </div>
+                                <span class="chart-label">جعبه ۳</span
+                                ><span class="chart-value" id="chartValue3">0</span>
+                            </div>
+                            <div class="chart-bar-group">
+                                <div class="chart-bar-wrapper">
+                                    <div class="chart-bar" data-box="4" id="chartBar4" style="height: 0%"></div>
+                                </div>
+                                <span class="chart-label">جعبه ۴</span
+                                ><span class="chart-value" id="chartValue4">0</span>
+                            </div>
+                            <div class="chart-bar-group">
+                                <div class="chart-bar-wrapper">
+                                    <div class="chart-bar" data-box="5" id="chartBar5" style="height: 0%"></div>
+                                </div>
+                                <span class="chart-label">جعبه ۵</span
+                                ><span class="chart-value" id="chartValue5">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stats-history">
+                        <h3>تاریخچه مرورهای اخیر</h3>
+                        <div class="history-list" id="historyList">
+                            <div class="history-empty">هنوز مروری انجام نشده</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export/Import Modal -->
+        <div class="modal-overlay" id="exportModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>📦 خروجی / ورودی داده‌ها</h2>
+                    <button class="btn-close" id="btnCloseExport">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="export-content">
+                    <div class="export-section">
+                        <h3>خروجی گرفتن</h3>
+                        <p>تمام کارت‌ها و تنظیمات خود را به صورت فایل JSON دانلود کنید</p>
+                        <button class="btn-primary" id="btnDoExport">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            دانلود فایل JSON
+                        </button>
+                    </div>
+                    <div class="export-divider"><span>یا</span></div>
+                    <div class="export-section">
+                        <h3>ورودی داده‌ها</h3>
+                        <p>فایل JSON خود را بارگذاری کنید تا کارت‌ها اضافه شوند</p>
+                        <label class="file-upload-label" for="importFile">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            انتخاب فایل JSON
+                        </label>
+                        <input type="file" id="importFile" accept=".json" style="display: none" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal-overlay" id="deleteModal">
+            <div class="modal modal-sm">
+                <div class="modal-header"><h2 id="deleteModalTitle">⚠️ حذف کارت</h2></div>
+                <p class="delete-message" id="deleteMessage">آیا مطمئن هستید که می‌خواهید این کارت را حذف کنید؟</p>
+                <p class="delete-word" id="deleteWordPreview"></p>
+                <div class="form-actions">
+                    <button class="btn-secondary" id="btnCancelDelete">انصراف</button>
+                    <button class="btn-danger" id="btnConfirmDelete">حذف</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Box Picker Modal -->
+        <div class="modal-overlay" id="categoryBoxModal">
+            <div class="modal modal-sm category-box-modal">
+                <div class="modal-header">
+                    <h2 id="categoryBoxModalTitle">انتخاب جعبه</h2>
+                    <button class="btn-close" id="btnCloseCategoryBoxModal" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="category-box-picker" id="categoryBoxPicker"></div>
+                <div class="form-actions">
+                    <button class="btn-secondary" id="btnCancelCategoryBoxModal" type="button">انصراف</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div class="toast-container" id="toastContainer" role="status" aria-live="polite" aria-atomic="false"></div>
+
+        <!-- Keyboard Shortcuts Hint -->
+        <div class="shortcuts-hint" id="shortcutsHint">
+            <span
+                >⌨️ میانبر: <kbd>N</kbd> کارت جدید · <kbd>T</kbd> تغییر تم · <kbd>Space</kbd> نمایش پاسخ ·
+                <kbd>←</kbd> نادرست · <kbd>→</kbd> درست · <kbd>S</kbd> پخش تلفظ</span
+            >
+        </div>
+
+        <aside class="storage-bar" aria-label="نگه‌داری اطلاعات">
+            <span id="storageStatus" role="status">در حال اتصال به اطلاعات…</span>
+            <button type="button" id="btnBackups">نسخه‌های پشتیبان ↗</button>
+        </aside>
+
+        <section id="storageSetup" class="storage-screen" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+            <div class="storage-panel">
+                <span class="storage-symbol" aria-hidden="true">✦</span>
+                <span class="storage-eyebrow">خانهٔ تازهٔ واژه‌هایت</span>
+                <h1 id="setupTitle">یادگیری‌ات را همراه بیاور</h1>
+                <p id="setupDescription">
+                    اطلاعات در یک فایل پایگاه داده روی همین کامپیوتر نگه‌داری می‌شود. برای ادامه، فایل خروجی نسخهٔ قبلی
+                    را انتخاب کنید.
+                </p>
+                <label class="storage-file"
+                    >انتخاب فایل اطلاعات قبلی<input id="setupImportFile" type="file" accept=".json,application/json"
+                /></label>
+                <p class="storage-help">
+                    فایل index.html در پوشهٔ نسخهٔ جدید، ابزار انتقال است. اگر کتابخانه‌تان در نسخهٔ دیگری قرار دارد، از
+                    منوی خروجی همان برنامه فایل بگیرید؛ فایل خروجی قدیمی نیز پذیرفته می‌شود.
+                </p>
+                <button class="btn-primary" type="button" id="btnSetupImport" hidden>انتقال اطلاعات و ادامه</button>
+                <button class="btn-secondary" type="button" id="btnDownloadLegacy" hidden>
+                    دریافت نسخهٔ اصلی اطلاعات
+                </button>
+                <p id="setupError" class="storage-error" role="alert"></p>
+                <details class="storage-options">
+                    <summary>ساخت کتابخانهٔ تازه</summary>
+                    <p>اگر اطلاعات قبلی دارید، ابتدا آن‌ها را انتقال دهید.</p>
+                    <button class="btn-secondary" type="button" id="btnSetupEmpty">شروع با کتابخانهٔ خالی</button>
+                    <button class="btn-secondary" type="button" id="btnSetupSamples">شروع با کارت‌های نمونه</button>
+                </details>
+            </div>
+        </section>
+
+        <div
+            id="persistenceOverlay"
+            class="storage-screen persistence-screen"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="persistenceMessage"
+            hidden
+        >
+            <div class="storage-panel">
+                <span class="storage-symbol storage-pulse" aria-hidden="true">◈</span>
+                <p id="persistenceMessage">در حال ذخیره…</p>
+                <button class="btn-primary" id="btnRetryStorage" type="button" hidden>بررسی دوباره و ادامه</button>
+                <button class="btn-secondary" id="btnEmergencyExport" type="button" hidden>
+                    دریافت نسخهٔ اطلاعات در انتظار
+                </button>
+                <button class="btn-primary" id="btnReloadStorage" type="button" hidden>بارگذاری دوباره</button>
+            </div>
+        </div>
+
+        <div id="backupModal" class="modal-overlay">
+            <section class="modal storage-backups" aria-labelledby="backupTitle">
+                <div class="modal-header">
+                    <h2 id="backupTitle">نگه‌داری اطلاعات</h2>
+                    <button class="btn-close" type="button" id="btnCloseBackups" aria-label="بستن">×</button>
+                </div>
+                <p>
+                    کارت‌ها، پیشرفت مرور و تنظیمات روی همین کامپیوتر ذخیره می‌شوند. یک نسخهٔ خروجی روی حافظه‌ای دیگر هم
+                    نگه دارید.
+                </p>
+                <div class="storage-actions">
+                    <button class="btn-primary" id="btnCreateBackup" type="button">ساخت نسخهٔ پشتیبان</button
+                    ><label class="storage-file"
+                        >بازیابی از فایل<input id="restoreFile" type="file" accept=".json,application/json"
+                    /></label>
+                </div>
+                <p id="backupInfo" role="status"></p>
+                <div id="backupList" class="backup-list"></div>
+                <details>
+                    <summary>محل نگه‌داری اطلاعات</summary>
+                    <code id="databasePath" dir="ltr"></code>
+                </details>
+            </section>
+        </div>
+        <script src="/data/fixed-expressions-data.js"></script>
+        <script src="/data/topic-phrases-data.js"></script>
+        <script type="module" src="/src/client/app.js"></script>
+        <script src="/src/client/ui/studio.js"></script>
+    </body>
+</html>

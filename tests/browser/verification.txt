@@ -1,0 +1,1 @@
+143 assertions passed. Synthetic data only; SQLite-backed app compared with legacy behavior.
