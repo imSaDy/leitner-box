@@ -77,4 +77,3 @@ docs/                  Architecture and verification notes
 ## License
 
 Released under the [ISC License](LICENSE).
-
