@@ -1,42 +1,49 @@
-# جعبهٔ لایتنر
+# Leitner Box
 
-یک برنامهٔ دسکتاپ فارسی برای یادگیری واژه، عبارت و جمله با روش مرور فاصله‌دار. برنامه روی Windows اجرا می‌شود و همهٔ اطلاعات را در یک پایگاه‌دادهٔ محلی SQLite نگه می‌دارد.
+A Persian-first desktop app for learning words, phrases, and sentences with spaced repetition. It runs locally on Windows and stores all study data in a transactional SQLite database.
 
-## نصب روی Windows
+## Install on Windows
 
-پیش‌نیاز: [Node.js 24.11 یا جدیدتر](https://nodejs.org/)
+**Requirement:** [Node.js 24.11 or later](https://nodejs.org/)
 
-1. فایل ZIP آخرین نسخه را از بخش **Releases** دریافت و در یک پوشهٔ دائمی استخراج کنید.
-2. روی `Install Leitner.cmd` دو بار کلیک کنید.
-3. از این پس برنامه را با شورت‌کات **Leitner Box** روی دسکتاپ باز کنید.
+1. Download the ZIP file from the [latest release](https://github.com/imSaDy/leitner-box/releases/latest).
+2. Extract it to a permanent folder.
+3. Double-click `Install Leitner.cmd`.
+4. Open the app from the **Leitner Box** shortcut on your desktop.
 
-برای اجرای بدون نصب شورت‌کات نیز می‌توانید روی `Start Leitner.cmd` دو بار کلیک کنید. اجرای روزمره به اینترنت نیاز ندارد؛ فقط دریافت تلفظ و فونت آنلاین به اینترنت وابسته است.
+You can also run `Start Leitner.cmd` directly without installing the shortcut.
 
-## حریم خصوصی و محل داده‌ها
+The app works offline for daily study. An internet connection is only needed for online pronunciation and web fonts.
 
-هر نصب تازه با یک پایگاه‌دادهٔ خالی شروع می‌شود. هیچ کارت، سابقهٔ مطالعه یا نسخهٔ پشتیبان شخصی در مخزن و فایل Release وجود ندارد. برنامه اطلاعات را به سرور یا فضای ابری ارسال نمی‌کند.
+## Privacy and data storage
 
-اطلاعات هر کاربر در حساب Windows خودش ذخیره می‌شود:
+Every fresh installation starts with an empty database. The repository and release files contain no personal cards, study history, logs, databases, or backups.
+
+Your data stays under your own Windows account:
 
 ```text
 %LOCALAPPDATA%\LeitnerBox\data\leitner.sqlite
 %LOCALAPPDATA%\LeitnerBox\data\backups\
 ```
 
-حذف کش مرورگر یا جابه‌جایی پوشهٔ برنامه، این پایگاه‌داده را حذف نمی‌کند. برای انتقال به رایانهٔ دیگر، از بخش **نسخه‌های پشتیبان** برنامه خروجی بگیرید و آن را در نصب جدید بازیابی کنید.
+Clearing browser storage or moving the application folder does not remove the database. The app does not upload study data to a server or cloud service.
 
-## قابلیت‌ها
+To move your collection to another computer, create a backup from the **Backups** section and restore that file in the new installation.
 
-- جعبه‌های لایتنر و مرور زمان‌بندی‌شده
-- کتابخانه، جست‌وجو، موضوع‌ها و یادداشت‌ها
-- پشتیبانی از تم روشن و تاریک و رابط راست‌به‌چپ
-- ذخیره‌سازی تراکنشی SQLite و تشخیص هم‌زمانی دو پنجره
-- پشتیبان‌گیری، دریافت فایل پشتیبان و بازیابی با تأیید کاربر
-- اجرا در پنجرهٔ مستقل Chrome یا Edge
+## Features
 
-برنامه بازیابی زمان‌بندی‌شده یا خودکار ندارد. بازیابی فقط با انتخاب مستقیم کاربر انجام می‌شود و پیش از جایگزینی داده‌ها یک پشتیبان تازه ساخته می‌شود.
+- Leitner boxes and scheduled reviews
+- Card library, search, topics, notes, and custom examples
+- Persian right-to-left interface
+- Light and dark themes with responsive layouts
+- Transactional SQLite persistence
+- Protection against stale writes from multiple open windows
+- Manual backup, download, and restore tools
+- Standalone app window using Chrome or Microsoft Edge
 
-## توسعه
+The app never restores a backup automatically or on a timer. A restore only happens after an explicit user action, and a new safety backup is created before current data is replaced.
+
+## Development
 
 ```text
 npm ci
@@ -45,14 +52,29 @@ npm run check
 npm test
 ```
 
-حالت توسعه با `npm run dev` روی درگاه 8766 و با دادهٔ جداگانه در `.local-data/development` اجرا می‌شود. آزمون‌ها فقط از پایگاه‌داده و پروفایل مرورگر موقت استفاده می‌کنند.
+Run `npm run dev` to start development mode on port 8766 with an isolated database under `.local-data/development`. Automated tests use temporary databases and temporary browser profiles.
 
-متغیرهای اختیاری محیط `LEITNER_DATA_DIR` و `LEITNER_PORT` هستند؛ نمونه‌ها در `.env.example` قرار دارند. جزئیات طراحی و تضمین‌های ذخیره‌سازی در [مستند معماری](docs/architecture.md) آمده است.
+Optional environment variables:
 
-## English
+- `LEITNER_DATA_DIR`: changes the local data directory.
+- `LEITNER_PORT`: changes the local server port.
 
-Leitner Box is a Persian-first spaced-repetition desktop app for Windows. Install Node.js 24.11+, extract the latest release, and run `Install Leitner.cmd`. Every fresh installation starts with an empty local SQLite database under `%LOCALAPPDATA%\LeitnerBox\data`; no personal study data is included or uploaded.
+See [`.env.example`](.env.example) for examples and [the architecture documentation](docs/architecture.md) for storage guarantees and project structure.
 
-## مجوز
+## Project structure
 
-این پروژه با مجوز [ISC](LICENSE) منتشر شده است.
+```text
+public/                Application page, styles, icons, and public learning content
+src/client/            Browser application, features, services, and UI modules
+src/server/            Local HTTP service and application configuration
+src/server/database/   SQLite schema, transactions, backups, and repository layer
+src/shared/            Validation shared by the client and server
+scripts/               Desktop launcher, shortcut installer, and developer tools
+tests/                 Unit, integration, and browser tests
+docs/                  Architecture and verification notes
+```
+
+## License
+
+Released under the [ISC License](LICENSE).
+
