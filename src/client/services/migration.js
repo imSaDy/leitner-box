@@ -83,12 +83,18 @@ export async function ensureInitialized(repository) {
         });
         document.getElementById('btnSetupEmpty').addEventListener('click', () => {
             const state = emptyState(),
-                preferences = defaultPreferences();
+                preferences = {
+                    ...defaultPreferences(),
+                    language: document.documentElement.lang === 'fa' ? 'fa' : 'en',
+                };
             finish({ format: 'leitner-backup-v2', state, preferences }, { state, preferences }, false);
         });
         document.getElementById('btnSetupSamples').addEventListener('click', () => {
             const state = emptyState(),
-                preferences = defaultPreferences();
+                preferences = {
+                    ...defaultPreferences(),
+                    language: document.documentElement.lang === 'fa' ? 'fa' : 'en',
+                };
             finish({ format: 'leitner-backup-v2', state, preferences }, { state, preferences }, true);
         });
         document.getElementById('btnDownloadLegacy').addEventListener('click', () => {

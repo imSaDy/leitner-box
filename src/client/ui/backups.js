@@ -58,7 +58,9 @@ export function installBackupUI(ctx) {
             const draft = decodeImport(payload);
             if (
                 !confirm(
-                    `بازیابی ${draft.state.cards.length.toLocaleString(document.documentElement.lang === 'en' ? 'en-US' : 'fa-IR')} کارت و سابقهٔ مرور؟ اطلاعات فعلی جایگزین می‌شود و قبل از آن یک نسخهٔ پشتیبان ساخته خواهد شد.`
+                    ctx.i18n.text(
+                        `بازیابی ${draft.state.cards.length.toLocaleString(document.documentElement.lang === 'en' ? 'en-US' : 'fa-IR')} کارت و سابقهٔ مرور؟ اطلاعات فعلی جایگزین می‌شود و قبل از آن یک نسخهٔ پشتیبان ساخته خواهد شد.`
+                    )
                 )
             )
                 return;

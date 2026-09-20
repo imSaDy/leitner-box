@@ -102,7 +102,7 @@ export function install(ctx) {
                     ctx.reviewState.mode === 'combined'
                         ? 'از مرور ترکیبی خارج می‌شوی؟ کارت‌هایی که هر دو مرحله‌شان کامل شده ذخیره شده‌اند، اما جواب‌های مرحله‌ی ناقص ذخیره نمی‌شود.'
                         : 'از مرور خارج می‌شوی؟ پاسخ‌های ثبت‌شده ذخیره شده‌اند، اما ادامه‌ی جلسه متوقف می‌شود.';
-                if (!confirm(message)) return;
+                if (!confirm(ctx.i18n.text(message))) return;
             }
 
             document.getElementById('reviewOverlay').classList.remove('active');
@@ -653,7 +653,7 @@ export function install(ctx) {
             const card = ctx.getCurrentReviewCard();
             if (!card) return;
 
-            if (!confirm(`آیا از حذف کارت «${card.word}» مطمئن هستید؟`)) return;
+            if (!confirm(ctx.i18n.text(`آیا از حذف کارت «${card.word}» مطمئن هستید؟`))) return;
 
             ctx.markImportedCardDeleted(card);
             // Remove from main data

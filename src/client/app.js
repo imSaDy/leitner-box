@@ -20,14 +20,16 @@ import { installStorageUI, downloadJson } from './ui/storage-ui.js';
 import { installBackupUI } from './ui/backups.js';
 import { decodeImport, emptyState } from '../shared/validation.js';
 import { createI18n } from './i18n.js';
+import { englishSamples } from './features/english-samples.js';
 
 async function start() {
     const repository = new Persistence();
     installStorageUI(repository);
+    const i18n = createI18n();
+    i18n.start();
     try {
         await repository.load();
-        const i18n = createI18n(repository.snapshot.preferences.language);
-        i18n.start();
+        i18n.setLanguage(repository.snapshot.preferences.language, { emit: false });
         const { seed } = await ensureInitialized(repository);
         // Setup or migration may select a different language than the empty database used before it.
         i18n.setLanguage(repository.snapshot.preferences.language, { emit: false });
@@ -55,8 +57,6 @@ async function start() {
         ctx.appData = { ...emptyState(), ...structuredClone(repository.snapshot.state) };
         ctx.appData.stats = { ...emptyState().stats, ...ctx.appData.stats };
         ctx.preferences = structuredClone(repository.snapshot.preferences);
-        const languageNeedsSave = ctx.preferences.language !== i18n.language;
-        ctx.preferences.language = i18n.language;
         ctx.downloadJson = downloadJson;
         ctx.decodeImport = decodeImport;
         installTransactions(ctx);
@@ -75,8 +75,13 @@ async function start() {
         i18n.onChange((language) => {
             languageSave = languageSave
                 .then(async () => {
-                    ctx.preferences.language = language;
-                    await ctx.saveData();
+                    await ctx.whenIdle();
+                    const saved = await ctx.runMutation(async () => {
+                        ctx.preferences.language = language;
+                        await ctx.saveData();
+                        return true;
+                    });
+                    if (!saved) ctx.loadLanguage();
                     ctx.updateDashboard();
                     ctx.populateCategoryFilter();
                     ctx.renderCards();
@@ -85,9 +90,16 @@ async function start() {
                 .catch((error) => ctx.showToast(error.message || 'Language preference was not saved.', 'error'));
             return languageSave;
         });
-        if (languageNeedsSave) await ctx.saveData();
         if (seed)
             await ctx.runMutation(async () => {
+                if (ctx.preferences.language === 'en') {
+                    ctx.appData.cards.push(...englishSamples());
+                    await ctx.saveData();
+                    ctx.populateCategoryFilter();
+                    ctx.updateDashboard();
+                    ctx.renderCards();
+                    return;
+                }
                 await ctx.upsertFixedExpressionEntries(ctx.getEmbeddedFixedExpressionEntries(), true);
                 await ctx.upsertTopicPhraseEntries(ctx.getEmbeddedTopicPhraseEntries(), true);
             });

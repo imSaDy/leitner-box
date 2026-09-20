@@ -20,6 +20,7 @@
         <link rel="stylesheet" href="/styles/base.css" />
         <link rel="stylesheet" href="/styles/studio.css" />
         <link rel="stylesheet" href="/styles/storage.css" />
+        <link rel="stylesheet" href="/styles/bilingual.css" />
         <link rel="icon" href="/assets/icon.ico" />
     </head>
     <body>
@@ -132,7 +133,7 @@
                             <div class="paper-top"><span>THE DAILY PRACTICE</span><span>↗</span></div>
                             <div class="paper-word">make it<br /><i>stick.</i></div>
                             <div class="paper-line"></div>
-                            <span class="paper-meaning" dir="rtl">یاد بگیر. مرور کن. به خاطر بسپار.</span>
+                            <span class="paper-meaning" dir="auto">یاد بگیر. مرور کن. به خاطر بسپار.</span>
                             <div class="paper-bottom"><span>LEITNER METHOD</span><span>01 — 05</span></div>
                         </div>
                         <div class="memory-tag"><span>✓</span> Small steps. Lasting progress.</div>
@@ -618,13 +619,13 @@
                     </div>
                     <div class="form-group" id="vocabularyMeaningGroup">
                         <label for="inputMeaning">معنی فارسی <span class="required">*</span></label>
-                        <input type="text" id="inputMeaning" dir="rtl" placeholder="مثلاً: خوش‌اقبالی" required />
+                        <input type="text" id="inputMeaning" dir="auto" placeholder="مثلاً: خوش‌اقبالی" required />
                     </div>
                     <div class="form-group sentence-field" id="sentenceMeaningGroup" style="display: none">
                         <label for="inputSentenceMeaning">معنی فارسی جمله <span class="required">*</span></label>
                         <textarea
                             id="inputSentenceMeaning"
-                            dir="rtl"
+                            dir="auto"
                             rows="3"
                             placeholder="ترجمه یا مفهوم فارسی جمله..."
                             disabled
@@ -640,7 +641,7 @@
                                 placeholder="انتخاب یا تایپ دسته جدید..."
                                 required
                                 autocomplete="off"
-                                dir="ltr"
+                                dir="auto"
                             />
                             <datalist id="categoryList"></datalist>
                             <div class="category-new-hint" id="categoryNewHint" style="display: none">
@@ -671,7 +672,7 @@
                         <label for="inputSentenceHint">راهنمایی (اختیاری)</label>
                         <textarea
                             id="inputSentenceHint"
-                            dir="rtl"
+                            dir="auto"
                             rows="2"
                             placeholder="مثلاً: با although شروع می‌شود، یا زمان جمله past perfect است..."
                             disabled
@@ -681,7 +682,7 @@
                         <label for="inputNotes">یادداشت (اختیاری)</label>
                         <textarea
                             id="inputNotes"
-                            dir="rtl"
+                            dir="auto"
                             rows="2"
                             placeholder="یادداشت یا نکته‌ای برای حفظ بهتر..."
                         ></textarea>
@@ -724,8 +725,10 @@
                     <div class="review-card-inner" id="reviewCardInner">
                         <!-- Front -->
                         <div class="review-card-front">
-                            <div class="card-box-badge" id="reviewBoxBadge">جعبه ۱</div>
-                            <div class="card-category-badge" id="reviewCategoryBadge">General</div>
+                            <div class="review-card-meta">
+                                <div class="card-box-badge" id="reviewBoxBadge">جعبه ۱</div>
+                                <div class="card-category-badge" id="reviewCategoryBadge" dir="auto">General</div>
+                            </div>
                             <button class="btn-speak" id="btnSpeakFront" title="پخش تلفظ">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
@@ -744,8 +747,10 @@
                         </div>
                         <!-- Back -->
                         <div class="review-card-back">
-                            <div class="card-box-badge" id="reviewBoxBadgeBack">جعبه ۱</div>
-                            <div class="card-category-badge" id="reviewCategoryBadgeBack">General</div>
+                            <div class="review-card-meta">
+                                <div class="card-box-badge" id="reviewBoxBadgeBack">جعبه ۱</div>
+                                <div class="card-category-badge" id="reviewCategoryBadgeBack" dir="auto">General</div>
+                            </div>
                             <button class="btn-speak" id="btnSpeakBack" title="پخش تلفظ">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
@@ -754,7 +759,7 @@
                                 </svg>
                             </button>
                             <div class="card-word-small" id="reviewWordBack">Word</div>
-                            <div class="card-meaning" id="reviewMeaning">معنی</div>
+                            <div class="card-meaning" id="reviewMeaning" dir="auto">معنی</div>
                             <div class="card-example" id="reviewExample">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                     <path
@@ -767,7 +772,7 @@
                                 <span id="reviewExampleText">Example sentence</span>
                             </div>
                             <div class="card-notes" id="reviewNotes">
-                                <span id="reviewNotesText">Notes</span>
+                                <span id="reviewNotesText" dir="auto">Notes</span>
                             </div>
                         </div>
                     </div>
@@ -781,7 +786,7 @@
                         <span class="card-category-badge-inline" id="typingCategoryBadge">General</span>
                     </div>
                     <div class="typing-prompt-label">معنی فارسی</div>
-                    <div class="typing-meaning" id="typingMeaning">معنی</div>
+                    <div class="typing-meaning" id="typingMeaning" dir="auto">معنی</div>
                     <form class="typing-answer-form" id="typingAnswerForm">
                         <input
                             type="text"
@@ -866,7 +871,7 @@
                     </div>
                     <div class="sentence-prompt-block">
                         <div class="typing-prompt-label">معنی فارسی</div>
-                        <div class="sentence-meaning" id="sentenceReviewMeaning">معنی جمله</div>
+                        <div class="sentence-meaning" id="sentenceReviewMeaning" dir="auto">معنی جمله</div>
                     </div>
                     <form class="sentence-answer-form" id="sentenceAnswerForm">
                         <textarea
@@ -887,6 +892,7 @@
                     <div
                         class="sentence-hint-panel"
                         id="sentenceHintPanel"
+                        dir="auto"
                         style="display: none"
                         aria-live="polite"
                     ></div>
@@ -899,7 +905,7 @@
                         </button>
                         <div class="sentence-correct-answer" id="sentenceCorrectAnswer">English sentence</div>
                     </div>
-                    <div class="sentence-notes-review" id="sentenceNotesReview" style="display: none"></div>
+                    <div class="sentence-notes-review" id="sentenceNotesReview" dir="auto" style="display: none"></div>
                     <div class="sentence-buttons">
                         <button class="btn-secondary" id="btnShowSentenceHint" type="button">راهنمایی</button>
                         <button class="btn-secondary" id="btnGiveUpSentence" type="button">بلد نیستم</button>

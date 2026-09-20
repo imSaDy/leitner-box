@@ -1,4 +1,51 @@
 const ENGLISH = new Map([
+    ['پشتیبان پیدا نشد.', 'Backup not found.'],
+    ['فایل پشتیبان آسیب دیده است.', 'The backup file is damaged.'],
+    [
+        'شناسهٔ ذخیره قبلاً برای دادهٔ دیگری استفاده شده است.',
+        'This save identifier was already used for different data.',
+    ],
+    [
+        'اطلاعات در پنجرهٔ دیگری تغییر کرده است. برای ادامه، نسخهٔ جدید را بارگذاری کنید.',
+        'Data changed in another window. Reload the latest version to continue.',
+    ],
+    ['ذخیره شامل حذف تأییدنشدهٔ کارت است.', 'This save contains an unconfirmed card deletion.'],
+    ['صحت فایل پشتیبان تأیید نشد.', 'The backup integrity check failed.'],
+    [
+        'پایگاه داده از قبل اطلاعات دارد. از افزودن کارت‌ها یا بازیابی تأییدشده استفاده کنید.',
+        'The database already contains data. Import cards or use the confirmed restore option.',
+    ],
+    [
+        'از مرور ترکیبی خارج می‌شوی؟ کارت‌هایی که هر دو مرحله‌شان کامل شده ذخیره شده‌اند، اما جواب‌های مرحله‌ی ناقص ذخیره نمی‌شود.',
+        'Leave combined review? Cards with both stages completed are saved. Incomplete stages will not be saved.',
+    ],
+    [
+        'از مرور خارج می‌شوی؟ پاسخ‌های ثبت‌شده ذخیره شده‌اند، اما ادامه‌ی جلسه متوقف می‌شود.',
+        'Leave this review? Recorded answers are saved; the remaining session will end.',
+    ],
+    ['تعداد کارت‌ها بیش از حد مجاز است.', 'The file contains too many cards.'],
+    ['آمار معتبر نیست.', 'Invalid statistics.'],
+    ['سابقهٔ مرور معتبر نیست.', 'Invalid review history.'],
+    ['تنظیمات معتبر نیست.', 'Invalid settings.'],
+    ['تنظیم ناشناخته است.', 'Unknown setting.'],
+    ['تم معتبر نیست.', 'Invalid theme.'],
+    ['روش مرور معتبر نیست.', 'Invalid review mode.'],
+    ['زبان معتبر نیست.', 'Invalid interface language.'],
+    ['فرمت فایل معتبر نیست.', 'Invalid file format.'],
+    ['اطلاعات اصلی نسخهٔ قدیمی در فایل نیست.', 'The file does not contain the original data.'],
+    ['اطلاعات نسخهٔ قبلی خوانا نیست.', 'The previous data could not be read.'],
+    ['نوع درخواست معتبر نیست.', 'Invalid request type.'],
+    ['حجم فایل بیش از حد مجاز است.', 'The file is too large.'],
+    ['مبدأ درخواست مجاز نیست.', 'This request origin is not allowed.'],
+    ['ارتباط برنامه تازه شده است؛ دوباره تلاش کنید.', 'The application connection has refreshed. Please try again.'],
+    ['میزبان مجاز نیست.', 'This host is not allowed.'],
+    ['مسیر پیدا نشد.', 'Path not found.'],
+    ['درخواست مجاز نیست.', 'Request not allowed.'],
+    ['فایل پیدا نشد.', 'File not found.'],
+    [
+        'ذخیره انجام نشد؛ ارتباط یا دسترسی به پایگاه داده را بررسی کنید.',
+        'Save failed. Check the connection and database access.',
+    ],
     ['جعبه لایتنر | Leitner Box - مرور لغات انگلیسی', 'Leitner Box | Spaced repetition for English'],
     [
         'اپلیکیشن جعبه لایتنر برای یادگیری و مرور لغات انگلیسی با سیستم مرور فاصله‌دار',
@@ -47,7 +94,7 @@ const ENGLISH = new Map([
         'کارت را ببینید، پاسخ را به یاد بیاورید و خودتان ارزیابی کنید.',
         'See the card, recall the answer, and grade yourself.',
     ],
-    ['معنی فارسی را ببینید و معادل انگلیسی را تایپ کنید.', 'See the Persian meaning and type the English answer.'],
+    ['معنی فارسی را ببینید و معادل انگلیسی را تایپ کنید.', 'Read the meaning and type the English answer.'],
     [
         'اول مرور کارت‌ها، بعد تمرین تایپ؛ تعداد کارت‌های هر بسته را انتخاب کنید.',
         'Review cards first, then practise typing. Choose the batch size.',
@@ -120,10 +167,10 @@ const ENGLISH = new Map([
         'Phonetic pronunciation is fetched automatically from the internet.',
     ],
     ['جمله انگلیسی', 'English sentence'],
-    ['معنی فارسی', 'Persian meaning'],
+    ['معنی فارسی', 'Meaning'],
     ['مثلاً: خوش‌اقبالی', 'For example: good fortune'],
-    ['معنی فارسی جمله', 'Persian sentence meaning'],
-    ['ترجمه یا مفهوم فارسی جمله...', 'Persian translation or meaning…'],
+    ['معنی فارسی جمله', 'Sentence meaning'],
+    ['ترجمه یا مفهوم فارسی جمله...', 'A definition, translation, or clue…'],
     ['دسته موضوعی', 'Topic category'],
     ['انتخاب یا تایپ دسته جدید...', 'Choose or type a new category…'],
     ['دسته جدید ساخته خواهد شد', 'A new category will be created'],
@@ -293,13 +340,15 @@ const ENGLISH = new Map([
     ['ارتباط با برنامه برقرار نشد.', 'Could not connect to the application.'],
     ['درخواست انجام نشد.', 'The request could not be completed.'],
     [
-        'تأیید ذخیره دریافت نشد. اطلاعات در انتظار است؛ اتصال برنامه را دوباره بررسی کنید.',
-        'Save confirmation was not received. Your pending data is preserved; check the app connection and try again.',
+        'تأیید ذخیره دریافت نشد. اطلاعات در انتظار است؛ برنامه خودکار دوباره تلاش می‌کند.',
+        'Save confirmation was not received. Your pending data is preserved and the app will retry automatically.',
     ],
 ]);
 
 const ATTRIBUTES = ['title', 'placeholder', 'aria-label', 'content'];
 const USER_CONTENT_SELECTOR = [
+    'script',
+    'style',
     '[translate="no"]',
     '.word-text',
     'td.col-meaning',
@@ -323,6 +372,7 @@ const USER_CONTENT_SELECTOR = [
     '#sentenceReviewMeaning',
     '#sentenceCorrectAnswer',
     '#sentenceNotesReview',
+    '#sentenceHintPanel',
     '#deleteWordPreview',
     '#categoryBoxModalTitle',
 ].join(',');
@@ -346,6 +396,25 @@ function pluralCount(value, singular, plural = `${singular}s`) {
 }
 
 const RULES = [
+    [/^(.+) · دریافت نسخه$/, ([, date]) => `${date} · Download backup`],
+    [
+        /^آیا مطمئن هستید که می‌خواهید ([۰-۹0-9٬,]+) کارت انتخاب‌شده را حذف کنید؟$/,
+        ([, count]) => `Delete ${pluralCount(count, 'selected card')}?`,
+    ],
+    [
+        /^بازیابی ([۰-۹0-9٬,]+) کارت و سابقهٔ مرور؟ اطلاعات فعلی جایگزین می‌شود و قبل از آن یک نسخهٔ پشتیبان ساخته خواهد شد.$/,
+        ([, count]) =>
+            `Restore ${pluralCount(count, 'card')} and review history? Current data will be replaced after a safety backup is created.`,
+    ],
+    [
+        /^([۰-۹0-9٬,]+) کارت به جعبه (بعدی|قبلی) منتقل شد(?:، ([۰-۹0-9٬,]+) کارت در مرز جعبه بود)?$/,
+        ([, count, direction, skipped]) =>
+            `${pluralCount(count, 'card')} moved to the ${direction === 'بعدی' ? 'next' : 'previous'} box${skipped ? `; ${pluralCount(skipped, 'card')} already at the limit` : ''}`,
+    ],
+    [/^.* تاریخ معتبری نیست\.$/, () => 'Invalid date.'],
+    [/^شناسهٔ تکراری در کارت ([0-9]+) وجود دارد\.$/, ([, count]) => `Duplicate identifier in card ${count}.`],
+    [/^.* وجود ندارد\.$/, () => 'A required field is missing.'],
+    [/^.* معتبر نیست\.$/, () => 'Invalid data. Check the file or field and try again.'],
     [/^([۰-۹0-9٬,]+) کارت آماده مرور$/, ([, count]) => `${pluralCount(count, 'card')} due`],
     [
         /^([۰-۹0-9٬,]+) کارت آماده است؛ امروز هم فرصتی برای به خاطر سپردن.$/,
@@ -473,11 +542,11 @@ export function createI18n(initialLanguage = 'en') {
 
     function updateToggleLabels() {
         document.querySelectorAll('[data-language-toggle-label]').forEach((label) => {
-            const nextLabel = language === 'fa' ? 'EN' : 'FA';
+            const nextLabel = 'EN';
             if (label.textContent !== nextLabel) label.textContent = nextLabel;
         });
         document.querySelectorAll('[data-language-toggle]').forEach((button) => {
-            const nextTitle = language === 'fa' ? 'Switch to English' : 'تغییر زبان به فارسی';
+            const nextTitle = language === 'fa' ? 'Switch to English' : 'Change interface language';
             if (button.title !== nextTitle) button.title = nextTitle;
             if (button.getAttribute('aria-label') !== nextTitle) button.setAttribute('aria-label', nextTitle);
         });
@@ -531,6 +600,9 @@ export function createI18n(initialLanguage = 'en') {
     }
 
     return {
+        text(value) {
+            return language === 'en' ? translateToEnglish(value) || value : value;
+        },
         get language() {
             return language;
         },

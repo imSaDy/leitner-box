@@ -14,7 +14,7 @@
   <img alt="Windows" src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=flat-square&logo=windows11&logoColor=white" />
   <img alt="Node.js 24.11+" src="https://img.shields.io/badge/Node.js-24.11%2B-339933?style=flat-square&logo=nodedotjs&logoColor=white" />
   <img alt="SQLite" src="https://img.shields.io/badge/storage-SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white" />
-  <img alt="Persian and English" src="https://img.shields.io/badge/UI-Persian%20%2B%20English-8B5CF6?style=flat-square" />
+  <img alt="English by default" src="https://img.shields.io/badge/UI-English%20by%20default-8B5CF6?style=flat-square" />
   <img alt="ISC License" src="https://img.shields.io/badge/license-ISC-14B8A6?style=flat-square" />
 </p>
 
@@ -32,29 +32,60 @@
 
 ## Built for focused, private learning
 
-|                               |                                                                                                     |
-| ----------------------------- | --------------------------------------------------------------------------------------------------- |
-| **🧠 Spaced repetition**      | Five Leitner boxes schedule reviews as your memory improves.                                        |
-| **🌐 Persian and English**    | Switch instantly between a complete RTL Persian interface and an LTR English interface.             |
-| **💾 Reliable local storage** | Transactional SQLite writes, stale-window protection, and acknowledged saves protect your progress. |
-| **📦 Backup and restore**     | Create, download, inspect, and explicitly restore local backups.                                    |
-| **⌨️ Flexible review**        | Use flashcards, English typing, sentence practice, or a combined workflow.                          |
-| **🎨 Designed for daily use** | Responsive layouts, light and dark themes, keyboard shortcuts, and subtle motion.                   |
+|                               |                                                                                                        |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------ |
+| **🧠 Spaced repetition**      | Five Leitner boxes schedule reviews as your memory improves.                                           |
+| **🌐 English by default**     | An English interface from first launch, with an optional RTL interface and saved language preferences. |
+| **💾 Reliable local storage** | Transactional SQLite writes, stale-window protection, and acknowledged saves protect your progress.    |
+| **📦 Backup and restore**     | Create, download, inspect, and explicitly restore local backups.                                       |
+| **⌨️ Flexible review**        | Use flashcards, English typing, sentence practice, or a combined workflow.                             |
+| **🎨 Designed for daily use** | Responsive layouts, light and dark themes, keyboard shortcuts, and subtle motion.                      |
 
-## Bilingual by design
+## Choose how you practise
 
-The language button changes labels, messages, dates, numbers, layout direction, and accessibility text. Your card content stays exactly as you entered it.
+Select a review mode on the dashboard, then start a due box or a topic. Meanings can be definitions, translations, or personal clues in any language. The interface language never rewrites your cards.
 
-<table>
-  <tr>
-    <td width="50%"><img src="docs/images/dashboard-en.png" alt="English LTR interface" /></td>
-    <td width="50%"><img src="docs/images/dashboard-fa.png" alt="Persian RTL interface" /></td>
-  </tr>
-  <tr>
-    <td align="center"><strong>English · LTR</strong></td>
-    <td align="center"><strong>فارسی · راست‌به‌چپ</strong></td>
-  </tr>
-</table>
+| Method                | How it works                                                                                                                                                                              | Good for                             |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| **Flashcards**        | Recall the meaning, reveal the answer, and select **I knew it** or **I missed it**.                                                                                                       | Quick recall and self-assessment     |
+| **English typing**    | Read the meaning and type the word or phrase. Incorrect attempts reveal progressive spelling hints; use **I don't know** to reveal the answer. Select **Next card** to record the result. | Active recall and spelling           |
+| **Combined**          | Review a configurable batch as flashcards, then type the same vocabulary. Both stages must be correct for a successful result; each completed card is recorded once.                      | Checking both recognition and recall |
+| **Sentence practice** | Sentence cards automatically use a full-sentence exercise in any mode. Read the meaning, use your optional hint, type the sentence, and check the answer.                                 | Practising complete expressions      |
+
+### Flashcards
+
+![Flashcard review with a word, box badge, topic and pronunciation control](docs/images/flashcards.png)
+
+### English typing
+
+![Typing practice using an English definition as the prompt](docs/images/typing.png)
+
+### Combined practice
+
+The batch-size setting controls how many vocabulary cards you see before typing them. A successful result moves a card up one box; a missed result moves it down one box. Leaving halfway through a card does not record its unfinished result. In the other review modes, a missed card returns to Box 1.
+
+<table><tr>
+<td width="50%"><img src="docs/images/combined-flashcard.png" alt="Combined practice: recall stage" /></td>
+<td width="50%"><img src="docs/images/combined-typing.png" alt="Combined practice: typing stage" /></td>
+</tr><tr><td align="center">1. Recall and assess</td><td align="center">2. Type and verify</td></tr></table>
+
+### Sentence practice
+
+![Sentence practice with an optional hint and an English answer field](docs/images/sentences.png)
+
+## Review by topic
+
+Choose a built-in category or type a new one when creating a card. Use **Review by topic** to find a subject and see its total and due counts. Select **Review**, then choose **All boxes** or one box; only cards due in that topic are included. The dashboard's selected review mode applies to topic sessions too.
+
+![Topics with due counts and review buttons](docs/images/topics.png)
+
+<p align="center"><img src="docs/images/topic-picker.png" width="620" alt="Choose all boxes or a single due box for a topic" /></p>
+
+## Create your own cards
+
+Add a word, phrase, or sentence with a meaning and topic. Examples, notes, and sentence hints are optional. Fields follow the direction of the text you enter. New installations start empty unless you explicitly choose sample cards; the English starter set uses English definitions.
+
+<p align="center"><img src="docs/images/create-card.png" width="520" alt="Creating a card with an English definition and topic" /></p>
 
 ## Quick start
 

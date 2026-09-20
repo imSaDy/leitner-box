@@ -1,8 +1,8 @@
 {
     "name": "leitner-box",
-    "version": "2.1.2",
+    "version": "2.1.3",
     "private": true,
-    "description": "A Persian-first desktop Leitner box with local transactional SQLite storage",
+    "description": "An English-first desktop Leitner box with local transactional SQLite storage",
     "main": "src/server/index.js",
     "engines": {
         "node": ">=24.11.0"
@@ -12,7 +12,7 @@
         "dev": "node scripts/dev.js",
         "test": "npm run test:server && npm run test:browser",
         "test:server": "node --disable-warning=ExperimentalWarning --test tests/unit/*.test.js tests/integration/*.test.js",
-        "test:browser": "node --disable-warning=ExperimentalWarning tests/browser/regression.cjs && node --disable-warning=ExperimentalWarning tests/browser/storage.cjs && node --disable-warning=ExperimentalWarning tests/browser/i18n.cjs",
+        "test:browser": "node --disable-warning=ExperimentalWarning tests/browser/regression.cjs && node --disable-warning=ExperimentalWarning tests/browser/storage.cjs && node --disable-warning=ExperimentalWarning tests/browser/i18n.cjs && node --disable-warning=ExperimentalWarning tests/browser/setup-language.cjs && node --disable-warning=ExperimentalWarning tests/browser/english-workflows.cjs",
         "check": "eslint src scripts tests/unit tests/integration tests/browser",
         "format": "prettier --write src public/*.html public/styles/*.css scripts tests/unit tests/integration tests/browser",
         "backup": "node --disable-warning=ExperimentalWarning scripts/backup.js"
@@ -22,7 +22,7 @@
         "spaced-repetition",
         "flashcards",
         "sqlite",
-        "persian"
+        "learning"
     ],
     "author": "imSaDy",
     "license": "ISC",

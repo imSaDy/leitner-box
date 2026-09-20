@@ -35,7 +35,7 @@ export function install(ctx) {
         escapeHtml: function escapeHtml(str) {
             const d = document.createElement('div');
             d.textContent = str == null ? '' : String(str);
-            return d.innerHTML;
+            return d.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         },
         normalizeTypedAnswer: function normalizeTypedAnswer(value) {
             return (value || '')

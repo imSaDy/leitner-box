@@ -8,6 +8,7 @@ export class Persistence extends EventTarget {
     pending = null;
     blocked = false;
     #retry = null;
+    #retryTimer = null;
 
     notify(status, message = '') {
         this.dispatchEvent(new CustomEvent('status', { detail: { status, message } }));
@@ -24,8 +25,24 @@ export class Persistence extends EventTarget {
     retry() {
         this.#retry?.();
     }
+    async #waitForRetry(delay) {
+        await new Promise((resolve) => {
+            let settled = false;
+            const resume = () => {
+                if (settled) return;
+                settled = true;
+                clearTimeout(this.#retryTimer);
+                this.#retryTimer = null;
+                this.#retry = null;
+                resolve();
+            };
+            this.#retry = resume;
+            this.#retryTimer = setTimeout(resume, delay);
+        });
+    }
     async #sendPending() {
         let attempts = 0;
+        let reconnectDelay = 1500;
         while (true) {
             try {
                 const result = await this.api.request(this.pending.url, {
@@ -49,12 +66,10 @@ export class Persistence extends EventTarget {
                 if (++attempts < 2) continue;
                 this.notify(
                     'offline',
-                    'تأیید ذخیره دریافت نشد. اطلاعات در انتظار است؛ اتصال برنامه را دوباره بررسی کنید.'
+                    'تأیید ذخیره دریافت نشد. اطلاعات در انتظار است؛ برنامه خودکار دوباره تلاش می‌کند.'
                 );
-                await new Promise((resolve) => {
-                    this.#retry = resolve;
-                });
-                this.#retry = null;
+                await this.#waitForRetry(reconnectDelay);
+                reconnectDelay = Math.min(reconnectDelay * 2, 10000);
                 this.notify('saving', 'در حال بررسی و ذخیره…');
             }
         }

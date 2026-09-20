@@ -1672,6 +1672,15 @@ kbd,
     html {
         scroll-padding-top: 125px;
     }
+    .cards-filter,
+    .cards-filter > .search-box,
+    .cards-filter > .select-box,
+    .cards-filter > .due-only-toggle,
+    .cards-filter > .filter-tabs {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
     .app-header {
         padding: 0 18px;
     }

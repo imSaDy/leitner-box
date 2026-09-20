@@ -155,6 +155,7 @@ export function install(ctx) {
                         (c) => ctx.normalizeCategory(c.category) === normalizedCat
                     ).length;
                     const opt = document.createElement('option');
+                    opt.setAttribute('translate', 'no');
                     opt.value = normalizedCat;
                     opt.textContent = `${normalizedCat} (${count})`;
                     select.appendChild(opt);

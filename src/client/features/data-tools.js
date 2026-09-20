@@ -36,7 +36,7 @@ export function install(ctx) {
                     const d = document.createElement('div');
                     d.className = 'history-item';
                     const label = e.category ? e.category : e.box ? ctx.PERSIAN_BOX_NAMES[e.box] : '';
-                    d.innerHTML = `<span class="history-date">${ctx.formatDate(e.date)} · ${ctx.escapeHtml(label)}</span><div class="history-result"><span class="history-correct">✅ ${ctx.escapeHtml(e.correct)}</span><span class="history-wrong">❌ ${ctx.escapeHtml(e.wrong)}</span></div>`;
+                    d.innerHTML = `<span class="history-date">${ctx.formatDate(e.date)} · <span ${e.category ? 'translate="no"' : ''}>${ctx.escapeHtml(label)}</span></span><div class="history-result"><span class="history-correct">✅ ${ctx.escapeHtml(e.correct)}</span><span class="history-wrong">❌ ${ctx.escapeHtml(e.wrong)}</span></div>`;
                     hc.appendChild(d);
                 });
             }

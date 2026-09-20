@@ -177,6 +177,21 @@ const check = (value, message) => {
         );
 
         console.log('PASS: outage export and manual retry.');
+        const reconnect = await open();
+        await reconnect.page.route('**/api/state', (route) =>
+            route.request().method() === 'PUT' ? route.abort('failed') : route.continue()
+        );
+        await review(reconnect.page);
+        await reconnect.page.locator('#btnWrong').click();
+        await reconnect.page.locator('#btnRetryStorage').waitFor({ state: 'visible' });
+        await reconnect.page.unroute('**/api/state');
+        await reconnect.page.locator('#reviewComplete').waitFor({ state: 'visible', timeout: 5000 });
+        check(
+            reconnect.repository.read().state.cards[0].box === 1 && reconnect.repository.read().revision === 2,
+            'automatic reconnect commits the pending operation exactly once'
+        );
+
+        console.log('PASS: automatic reconnect after a temporary outage.');
         const conflict = await open();
         const newer = initial();
         newer.cards[0].notes = 'Edited in another window';
@@ -254,8 +269,22 @@ const check = (value, message) => {
         fs.mkdirSync(artifacts, { recursive: true });
         await setup.page.screenshot({ path: path.join(artifacts, 'database-setup.png') });
         await setup.page.setViewportSize({ width: 390, height: 844 });
+        const setupMobileLayout = await setup.page.evaluate(() => ({
+            innerWidth,
+            documentWidth: document.documentElement.scrollWidth,
+            bodyWidth: document.body.scrollWidth,
+            overflow: [...document.querySelectorAll('body *')]
+                .map((element) => {
+                    const rect = element.getBoundingClientRect();
+                    return { tag: element.tagName, id: element.id, className: element.className, left: rect.left, right: rect.right };
+                })
+                .filter(({ left, right }) => left < -0.5 || right > innerWidth + 0.5)
+                .slice(0, 12),
+        }));
+        if (setupMobileLayout.documentWidth > setupMobileLayout.innerWidth)
+            console.log('Mobile setup overflow details:', setupMobileLayout);
         check(
-            await setup.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+            setupMobileLayout.documentWidth <= setupMobileLayout.innerWidth,
             'migration screen fits mobile'
         );
         await setup.page.screenshot({ path: path.join(artifacts, 'database-setup-mobile.png') });
@@ -281,7 +310,7 @@ const check = (value, message) => {
         assert.deepEqual(errors, []);
         checks++;
         console.log(
-            `PASS: ${checks} storage UI checks: migration, no cleanup, lost acknowledgement, outage/retry, conflict, rejected edit, atomic deletion, backup and restore.`
+            `PASS: ${checks} storage UI checks: migration, no cleanup, lost acknowledgement, outage/retry, automatic reconnect, conflict, rejected edit, atomic deletion, backup and restore.`
         );
     } catch (error) {
         console.error('Storage UI failure:', error);

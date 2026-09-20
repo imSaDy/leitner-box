@@ -236,7 +236,12 @@ export function install(ctx) {
                 .slice(0, 4)
                 .map((card) => `${card.word} → ${card.meaning}`)
                 .join('\n');
-            const more = cards.length > 4 ? `\n… و ${ctx.toPersianNumber(cards.length - 4)} کارت دیگر` : '';
+            const more =
+                cards.length > 4
+                    ? ctx.i18n.language === 'en'
+                        ? `\n… and ${cards.length - 4} more cards`
+                        : `\n… و ${ctx.toPersianNumber(cards.length - 4)} کارت دیگر`
+                    : '';
 
             document.getElementById('deleteModalTitle').textContent = '⚠️ حذف چند کارت';
             document.getElementById('deleteMessage').textContent =
