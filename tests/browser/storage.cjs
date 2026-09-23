@@ -65,6 +65,7 @@ const check = (value, message) => {
         resources.push({ context, server, repository });
         await page.goto(origin);
         if (seed) await ready(page);
+        else await page.locator('#storageSetup').waitFor({ state: 'visible' });
         return { page, repository, origin };
     }
     async function ready(page) {
@@ -90,7 +91,7 @@ const check = (value, message) => {
             mimeType: 'application/json',
             buffer: Buffer.from('{"cards":"invalid"}'),
         });
-        await migration.page.locator('#setupError').filter({ hasText: 'list of cards' }).waitFor();
+        await migration.page.locator('#setupError').filter({ hasText: /فهرست کارت‌ها|list of cards/ }).waitFor();
         check(!migration.repository.read().initialized, 'invalid migration does not initialize database');
         const sourceState = initial();
         sourceState.stats.history = [

@@ -10,15 +10,16 @@ $taskName = 'LeitnerBoxLocalService'
 $launchMutex = New-Object System.Threading.Mutex($false, 'Local\LeitnerBoxLauncher')
 $hasLaunchLock = $false
 function Stop-StaleLeitnerService {
+    param([switch]$CurrentInstallOnly)
     try {
         $expectedEntry = [System.IO.Path]::GetFullPath($serverEntry)
         $listeners = Get-NetTCPConnection -LocalPort $portNumber -State Listen -ErrorAction Stop
         foreach ($listener in $listeners) {
             $process = Get-CimInstance Win32_Process -Filter "ProcessId = $($listener.OwningProcess)" -ErrorAction Stop
             $commandLine = [string]$process.CommandLine
+            $sameInstall = $commandLine.IndexOf($expectedEntry, [System.StringComparison]::OrdinalIgnoreCase) -ge 0
             $isExpectedNode = $process.Name -ieq 'node.exe' -and
-                ($commandLine.IndexOf($expectedEntry, [System.StringComparison]::OrdinalIgnoreCase) -ge 0 -or
-                $commandLine -match '[\\/]src[\\/]server[\\/]index\.js')
+                ($sameInstall -or (-not $CurrentInstallOnly -and $commandLine -match '[\\/]src[\\/]server[\\/]index\.js'))
             if (-not $isExpectedNode) { continue }
             Stop-Process -Id $process.ProcessId -Force -ErrorAction Stop
             for ($attempt = 0; $attempt -lt 20; $attempt++) {
@@ -33,14 +34,16 @@ try {
     $hasLaunchLock = $launchMutex.WaitOne(15000)
     if (-not $hasLaunchLock) { throw 'Leitner startup is already in progress. Please try again in a few seconds.' }
     $nodeExecutable = (Get-Command node.exe -ErrorAction Stop).Source
-    $nodeVersion = [version]((& $nodeExecutable --version).Trim().TrimStart('v'))
+    $nodeVersionText = & $nodeExecutable --version
+    if ($LASTEXITCODE -ne 0 -or -not $nodeVersionText) { throw 'Node.js did not return a version.' }
+    $nodeVersion = [version](([string]$nodeVersionText).Trim().TrimStart('v'))
     if ($nodeVersion -lt [version]'24.11.0') { throw 'Node.js 24.11 or later is required.' }
     New-Item -ItemType Directory -Path $dataFolder -Force | Out-Null
     $health = $null
     $errorLog = $null
     try { $health = Invoke-RestMethod "$appAddress/api/health" -TimeoutSec 2 } catch {}
     $task = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
-    if ($health -and $health.application -eq 'leitner-box' -and $health.version -ne '2.1.6') {
+    if ($health -and $health.application -eq 'leitner-box' -and $health.version -ne '2.1.7') {
         if ($task) { Stop-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue }
         if (-not (Stop-StaleLeitnerService)) {
             throw 'An older Leitner service is still running. Close it or restart Windows, then try again.'
@@ -78,6 +81,20 @@ try {
         Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Force | Out-Null
         $task = Get-ScheduledTask -TaskName $taskName
     }
+    if (-not $health -and $task.State -eq 'Running') {
+        try { $health = Invoke-RestMethod "$appAddress/api/health" -TimeoutSec 3 } catch {}
+        if (-not $health) {
+            # A running task can hold a Node process that owns the port but no
+            # longer answers requests. Restart only this installation's process.
+            Stop-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
+            Stop-StaleLeitnerService -CurrentInstallOnly | Out-Null
+            for ($attempt = 0; $attempt -lt 20; $attempt++) {
+                $task = Get-ScheduledTask -TaskName $taskName
+                if ($task.State -ne 'Running') { break }
+                Start-Sleep -Milliseconds 100
+            }
+        }
+    }
     if (-not $health -or $task.State -ne 'Running') {
         $logFolder = Join-Path $dataFolder 'logs'
         New-Item -ItemType Directory -Path $logFolder -Force | Out-Null
@@ -98,12 +115,12 @@ try {
                 Select-Object -First 1 -ExpandProperty FullName
         }
         $detail = if ($errorLog -and (Test-Path -LiteralPath $errorLog)) {
-            (Get-Content -LiteralPath $errorLog -Raw).Trim()
+            [System.IO.File]::ReadAllText($errorLog).Trim()
         } else { '' }
         if (-not $detail) { $detail = 'The local service did not respond.' }
         throw "Leitner could not start.`n`n$detail`n`nLog: $errorLog"
     }
-    if ($health.application -ne 'leitner-box' -or $health.version -ne '2.1.6') {
+    if ($health.application -ne 'leitner-box' -or $health.version -ne '2.1.7') {
         throw "Another application is using port $portNumber."
     }
     if ($NoBrowser) { Write-Output $appAddress; exit 0 }
@@ -116,7 +133,11 @@ try {
     # database-backed application; its own setup screen handles a truly empty DB.
     Start-Process -FilePath $browserExecutable -ArgumentList @('--profile-directory="Default"', ('--app="' + $appAddress + '"'), '--start-maximized')
 } catch {
-    if ($NoBrowser) { Write-Error $_.Exception.Message; exit 1 }
+    if ($NoBrowser) { Write-Error ($_ | Format-List * -Force | Out-String); exit 1 }
+    if ($hasLaunchLock) {
+        $launchMutex.ReleaseMutex()
+        $hasLaunchLock = $false
+    }
     Add-Type -AssemblyName PresentationFramework
     [System.Windows.MessageBox]::Show($_.Exception.Message, 'Leitner', 'OK', 'Error') | Out-Null
     exit 1

@@ -73,7 +73,7 @@ export function createApplicationServer(repository, config) {
                 }
                 json(res, 200, {
                     application: 'leitner-box',
-                    version: '2.1.6',
+                    version: '2.1.7',
                     database: 'sqlite',
                     ready: !databaseIssue,
                     ...(databaseIssue ? { databaseIssue } : {}),

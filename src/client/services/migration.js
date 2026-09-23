@@ -41,7 +41,6 @@ export async function ensureInitialized(repository) {
         setup.hidden = true;
         return { seed: false };
     }
-    setup.hidden = false;
     if (legacy) preview(legacy);
     return new Promise((resolve) => {
         const fileInput = document.getElementById('setupImportFile');
@@ -101,5 +100,6 @@ export async function ensureInitialized(repository) {
             if (legacy) downloadJson(legacy, 'leitner-legacy-original.json');
         });
         document.getElementById('btnDownloadLegacy').hidden = !legacy;
+        setup.hidden = false;
     });
 }

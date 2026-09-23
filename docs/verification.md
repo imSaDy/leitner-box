@@ -1,5 +1,13 @@
 # Verification — SQLite refactor
 
+## v2.1.7 unresponsive-service recovery
+
+- A separate scheduled-task fixture bound port 8768 and deliberately blocked the Node event loop. The service watchdog detected failed health checks, killed that process and started a new one. The fixture task and process were stopped after the check.
+- The launcher retries an unresponsive running task, restarts only this installation's service, safely handles an empty error log and releases its launch mutex before displaying an error.
+- The empty-error-log failure was reproduced in Windows PowerShell and the replacement `ReadAllText` path was checked against an empty file. The migration screen now appears after its file input handler is ready, removing a startup click race found by the browser suite.
+- The live installation was upgraded against the existing personal database and checked for a ready health response, preserved revision and card count, and repeatable launches.
+- `npm run check`, `npm test`, and an extracted release ZIP smoke test passed.
+
 ## v2.1.6 windowless launcher
 
 - The desktop shortcut uses Windows Script Host to start the PowerShell launcher without a console window.
