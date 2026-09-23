@@ -10,7 +10,7 @@ The composition root is `src/client/app.js`. Feature installers receive a privat
 
 ## Storage
 
-SQLite uses WAL journaling, FULL synchronous mode and a busy timeout. Versioned SQL migrations run transactionally. Startup opens the schema and reads application rows without forcing a checkpoint or full integrity scan; this lets SQLite reopen a valid WAL after an interrupted Windows session. Full integrity checks are used for verified manual backups and diagnostics, never to reset data.
+SQLite uses a rollback journal in DELETE mode, EXTRA synchronous mode and a busy timeout. The application has one local writer and does not need WAL's persistent main/WAL file pair. Startup checks database integrity before any schema write. An existing WAL database is first read with its WAL, saved as a checksummed `before-journal-change` JSON backup, switched to DELETE mode, and checked again. A failed integrity check stops startup without replacing the database. Each write checks integrity and compares the current connection with a fresh connection before opening a transaction. Versioned SQL migrations run transactionally.
 
 - `cards`: one JSON record per card, indexed box/category and stable display position. Extra historical fields remain intact.
 - `app_state`: statistics, categories, deletion markers, extra metadata, preferences and a monotonic revision.

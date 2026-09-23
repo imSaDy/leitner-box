@@ -1,0 +1,125 @@
+/* Interface direction follows the locale; learning content keeps its own direction. */
+.cards-table th,
+.category-box-option,
+.form-group input,
+.form-group textarea {
+    text-align: start;
+}
+.sentence-type-label {
+    direction: inherit;
+}
+html[data-language='en'] .paper-meaning,
+html[data-language='en'] .stat-value,
+html[data-language='en'] .card-meaning,
+html[data-language='en'] .category-box-modal .modal-header h2 {
+    font-family: var(--font-en);
+}
+.card-row .col-meaning,
+.card-row .category-badge {
+    unicode-bidi: plaintext;
+    text-align: start;
+}
+.review-card-meta {
+    direction: inherit;
+}
+.review-card-front {
+    overflow-y: auto;
+}
+.card-word,
+.card-word-small,
+.typing-answer-word {
+    overflow-wrap: anywhere;
+}
+.review-progress-text {
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+.review-card-meta {
+    position: absolute;
+    top: 16px;
+    inset-inline-start: 16px;
+    inset-inline-end: 68px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+.review-card-meta .card-box-badge,
+.review-card-meta .card-category-badge {
+    position: static;
+    max-width: 100%;
+    width: auto;
+}
+.review-card-meta .card-box-badge {
+    flex-shrink: 0;
+}
+.review-card-meta .card-category-badge {
+    min-width: 0;
+    direction: inherit;
+    text-align: start;
+    unicode-bidi: plaintext;
+}
+.btn-speak {
+    left: auto;
+    right: auto;
+    inset-inline-end: 16px;
+}
+html[dir='rtl'] .btn-back svg {
+    transform: rotate(180deg);
+}
+.typing-hint {
+    text-align: start;
+}
+.typing-answer-form input,
+.sentence-answer-form textarea {
+    min-width: 0;
+    text-align: start;
+}
+.typing-badges > *,
+.category-box-modal .modal-header h2 {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.card-category-badge-inline {
+    unicode-bidi: plaintext;
+}
+.review-overlay {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+.review-header,
+.review-actions {
+    flex-shrink: 0;
+}
+.review-card-container,
+.typing-review-container,
+.sentence-review-container {
+    flex-shrink: 0;
+    min-width: 0;
+}
+html[data-language='en'] .category-box-modal .modal-header h2,
+html[data-language='en'] .category-box-option-count,
+html[data-language='en'] .card-box-badge,
+html[data-language='en'] .sentence-type-label {
+    font-family: var(--font-en);
+}
+/* Auto-direction fields follow entered content, including in an English interface. */
+[dir='auto']:dir(rtl) {
+    font-family: var(--font-fa);
+}
+html[data-language='en'] input[dir='auto']:dir(rtl),
+html[data-language='en'] textarea[dir='auto']:dir(rtl) {
+    font-family: var(--font-fa);
+}
+@media (max-width: 700px) {
+    .cards-table-wrapper::before {
+        right: auto;
+        inset-inline-start: 0;
+    }
+    html[data-language='en'] .cards-table-wrapper::before {
+        content: 'Swipe horizontally to see every column ↔';
+    }
+    .review-card-meta {
+        gap: 4px;
+    }
+}

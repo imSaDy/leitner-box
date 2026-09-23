@@ -192,6 +192,44 @@ const check = (value, message) => {
         );
 
         console.log('PASS: automatic reconnect after a temporary outage.');
+        const corrupt = await open();
+        let corruptRequests = 0;
+        await corrupt.page.route('**/api/state', (route) => {
+            if (route.request().method() !== 'PUT') return route.continue();
+            corruptRequests++;
+            return route.fulfill({
+                status: 503,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    error: 'DATABASE_CORRUPT',
+                    message: 'The database could not save.',
+                }),
+            });
+        });
+        await review(corrupt.page);
+        await corrupt.page.locator('#btnCorrect').click();
+        await corrupt.page.locator('#btnEmergencyExport').waitFor({ state: 'visible' });
+        check(await corrupt.page.locator('#btnReloadStorage').isVisible(), 'storage failure offers reload after export');
+        check(await corrupt.page.locator('#btnRetryStorage').isHidden(), 'storage failure does not offer an inactive retry button');
+        check(corruptRequests === 1, 'corrupt database failure does not retry indefinitely');
+        check(corrupt.repository.read().revision === 1, 'corrupt database response does not advance review');
+        const corruptDownload = corrupt.page.waitForEvent('download');
+        await corrupt.page.locator('#btnEmergencyExport').click();
+        const corruptDraft = JSON.parse(fs.readFileSync(await (await corruptDownload).path(), 'utf8'));
+        check(corruptDraft.state.cards[0].reviewCount === 8, 'failed review answer remains exportable');
+        console.log('PASS: corrupt database keeps pending review answer exportable.');
+        const serverFailure = await open();
+        let serverFailureRequests = 0;
+        await serverFailure.page.route('**/api/state', (route) => {
+            if (route.request().method() !== 'PUT') return route.continue();
+            serverFailureRequests++;
+            return route.fulfill({ status: 500, contentType: 'text/plain', body: 'unreadable server response' });
+        });
+        await review(serverFailure.page);
+        await serverFailure.page.locator('#btnCorrect').click();
+        await serverFailure.page.locator('#btnEmergencyExport').waitFor({ state: 'visible' });
+        check(serverFailureRequests === 1, 'unreadable 500 response stops retries and preserves the draft');
+        check(serverFailure.repository.read().revision === 1, 'failed server response leaves review uncommitted');
         const conflict = await open();
         const newer = initial();
         newer.cards[0].notes = 'Edited in another window';

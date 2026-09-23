@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { DatabaseSync } from 'node:sqlite';
 import { LeitnerRepository } from '../../src/server/database/repository.js';
@@ -85,6 +86,79 @@ test('a stale window cannot overwrite a newer revision', (t) => {
         code: 'REVISION_CONFLICT',
     });
     assert.deepEqual(r.read(), before);
+});
+
+test('a connection holding an old SQLite snapshot cannot accept a write', (t) => {
+    const first = setup(t);
+    write(first, { ...emptyState(), cards: [card()] });
+    first.db.prepare('PRAGMA journal_mode = WAL').get();
+    first.db.exec('BEGIN');
+    first.db.prepare('SELECT revision FROM app_state WHERE id = 1').get();
+    const second = new DatabaseSync(first.filename);
+    try {
+        second.prepare('UPDATE app_state SET revision = revision + 1 WHERE id = 1').run();
+        assert.throws(() => first.assertCurrentDatabase(), { code: 'DATABASE_CHANGED' });
+    } finally {
+        first.db.exec('ROLLBACK');
+        second.close();
+        first.db.prepare('PRAGMA journal_mode = DELETE').get();
+    }
+});
+
+test('startup converts a legacy WAL database after preserving its exact snapshot', () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'leitner-wal-upgrade-'));
+    const filename = path.join(directory, 'leitner.sqlite');
+    const first = new LeitnerRepository(directory);
+    const original = { ...emptyState(), cards: [card()] };
+    write(first, original);
+    first.close();
+    execFileSync(
+        process.execPath,
+        [
+            '--disable-warning=ExperimentalWarning',
+            '-e',
+            `const { DatabaseSync } = require('node:sqlite');
+             const db = new DatabaseSync(process.env.LEITNER_TEST_DB);
+             db.prepare('PRAGMA journal_mode = WAL').get();
+             db.prepare('UPDATE app_state SET revision = revision + 1 WHERE id = 1').run();
+             process.exit(0);`,
+        ],
+        { env: { ...process.env, LEITNER_TEST_DB: filename } }
+    );
+    assert.ok(fs.statSync(`${filename}-wal`).size > 0, 'legacy WAL contains the latest revision');
+    const upgraded = new LeitnerRepository(directory);
+    try {
+        assert.equal(upgraded.db.prepare('PRAGMA journal_mode').get().journal_mode, 'delete');
+        assert.equal(upgraded.db.prepare('PRAGMA synchronous').get().synchronous, 3);
+        assert.equal(upgraded.read().revision, 2);
+        assert.deepEqual(upgraded.read().state, original);
+        const archive = upgraded.backups.list().find((item) => item.name.includes('before-journal-change'));
+        assert.ok(archive);
+        const saved = JSON.parse(upgraded.backups.read(archive.name));
+        assert.equal(saved.revision, 2);
+        assert.deepEqual(saved.state, original);
+        assert.equal(upgraded.db.prepare('PRAGMA integrity_check').get().integrity_check, 'ok');
+    } finally {
+        upgraded.close();
+    }
+    assert.ok(!fs.existsSync(`${filename}-wal`), 'successful upgrade leaves no persistent WAL');
+});
+
+test('startup refuses a malformed database without replacing its file', () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'leitner-corrupt-startup-'));
+    const filename = path.join(directory, 'leitner.sqlite');
+    const first = new LeitnerRepository(directory);
+    write(first, { ...emptyState(), cards: [card()] });
+    first.close();
+    const fd = fs.openSync(filename, 'r+');
+    try {
+        fs.writeSync(fd, Buffer.alloc(32), 0, 32, 100);
+    } finally {
+        fs.closeSync(fd);
+    }
+    const damaged = fs.readFileSync(filename);
+    assert.throws(() => new LeitnerRepository(directory), { code: 'DATABASE_CORRUPT' });
+    assert.deepEqual(fs.readFileSync(filename), damaged);
 });
 
 test('replaying an acknowledged write is idempotent; changing the payload with same ID is rejected', (t) => {

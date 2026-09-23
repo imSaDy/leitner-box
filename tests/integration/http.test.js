@@ -35,6 +35,27 @@ test('local API authentication, migration, export, restore and private-file boun
     assert.deepEqual(backup.state, emptyState());
     const exported = await (await fetch(origin + '/api/export', { headers })).json();
     assert.deepEqual(exported.preferences, defaultPreferences());
+    const commit = r.commit.bind(r);
+    r.commit = () => {
+        const error = new Error('database disk image is malformed');
+        error.code = 'ERR_SQLITE_ERROR';
+        error.errcode = 779;
+        throw error;
+    };
+    const corruptResponse = await fetch(origin + '/api/state', {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+            state: exported.state,
+            preferences: exported.preferences,
+            expectedRevision: 1,
+            operationId: randomUUID(),
+        }),
+    });
+    assert.equal(corruptResponse.status, 503);
+    assert.equal((await corruptResponse.json()).error, 'DATABASE_CORRUPT');
+    assert.equal((await (await fetch(origin + '/api/health')).json()).ready, false);
+    r.commit = commit;
     for (const pathname of [
         '/src/server/config.js',
         '/src/client/%2e%2e%2fserver/config.js',
@@ -53,4 +74,5 @@ test('local API authentication, migration, export, restore and private-file boun
     const page = await fetch(origin);
     assert.equal(page.status, 200);
     assert.ok(page.headers.get('content-security-policy').includes("frame-ancestors 'none'"));
+    assert.equal((await fetch(origin + '/styles/bilingual.css')).status, 200);
 });

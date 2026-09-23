@@ -63,12 +63,21 @@ export function createApplicationServer(repository, config) {
             res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
             const url = new URL(req.url, origin);
             if (url.pathname === '/api/health' && req.method === 'GET') {
+                let databaseIssue = repository.storageFailure || null;
+                if (!databaseIssue) {
+                    try {
+                        repository.assertCurrentDatabase();
+                    } catch (error) {
+                        databaseIssue = error.code || 'DATABASE_UNAVAILABLE';
+                    }
+                }
                 json(res, 200, {
                     application: 'leitner-box',
-                    version: '2.1.3',
+                    version: '2.1.4',
                     database: 'sqlite',
-                    ready: true,
-                    initialized: repository.read().initialized,
+                    ready: !databaseIssue,
+                    ...(databaseIssue ? { databaseIssue } : {}),
+                    initialized: databaseIssue ? null : repository.read().initialized,
                 });
                 return;
             }
@@ -84,6 +93,7 @@ export function createApplicationServer(repository, config) {
             if (url.pathname.startsWith('/api/')) {
                 authorized(req, origin);
                 if (url.pathname === '/api/state' && req.method === 'GET') {
+                    repository.assertCurrentDatabase();
                     json(res, 200, repository.read());
                     return;
                 }
@@ -171,11 +181,24 @@ export function createApplicationServer(repository, config) {
             if (req.method === 'HEAD') res.end();
             else fs.createReadStream(filename).pipe(res);
         } catch (error) {
+            const sqliteFailure = error.code === 'ERR_SQLITE_ERROR';
+            const databaseCorrupt = sqliteFailure && [11, 26].includes(error.errcode & 255);
+            let responseError = error;
+            if (sqliteFailure) {
+                repository.storageFailure = databaseCorrupt ? 'DATABASE_CORRUPT' : 'DATABASE_UNAVAILABLE';
+                responseError = new AppError(
+                    repository.storageFailure,
+                    databaseCorrupt
+                        ? 'ذخیره در پایگاه داده با خطا روبه‌رو شد. اطلاعات در انتظار را دریافت کنید و برنامه را دوباره اجرا کنید.'
+                        : 'پایگاه داده در دسترس نیست. اطلاعات در انتظار را دریافت کنید و برنامه را دوباره اجرا کنید.',
+                    503
+                );
+            }
             if (!res.headersSent)
-                json(res, error.status || 500, {
-                    error: error.code || 'SERVER_ERROR',
-                    message: error.status
-                        ? error.message
+                json(res, responseError.status || 500, {
+                    error: responseError.code || 'SERVER_ERROR',
+                    message: responseError.status
+                        ? responseError.message
                         : 'ذخیره انجام نشد؛ ارتباط یا دسترسی به پایگاه داده را بررسی کنید.',
                 });
             else res.end();

@@ -343,6 +343,19 @@ const ENGLISH = new Map([
         'تأیید ذخیره دریافت نشد. اطلاعات در انتظار است؛ برنامه خودکار دوباره تلاش می‌کند.',
         'Save confirmation was not received. Your pending data is preserved and the app will retry automatically.',
     ],
+    [
+        'اتصال پایگاه داده قدیمی است. اطلاعات در انتظار را دریافت کنید و برنامه را دوباره اجرا کنید.',
+        'The database connection is stale. Download your pending data and restart the app.',
+    ],
+    [
+        'ذخیره در پایگاه داده با خطا روبه‌رو شد. اطلاعات در انتظار را دریافت کنید و برنامه را دوباره اجرا کنید.',
+        'The database could not save. Download your pending data and restart the app.',
+    ],
+    [
+        'پایگاه داده در دسترس نیست. اطلاعات در انتظار را دریافت کنید و برنامه را دوباره اجرا کنید.',
+        'The database is unavailable. Download your pending data and restart the app.',
+    ],
+    ['پاسخ برنامه خوانا نیست.', 'The app returned an unreadable response.'],
 ]);
 
 const ATTRIBUTES = ['title', 'placeholder', 'aria-label', 'content'];

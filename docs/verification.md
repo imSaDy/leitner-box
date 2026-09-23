@@ -1,5 +1,12 @@
 # Verification — SQLite refactor
 
+## v2.1.4 storage hardening
+
+- A legacy WAL fixture with an unclosed WAL upgrades to DELETE journaling and EXTRA synchronous mode. Its latest revision and every card are preserved in a checksummed `before-journal-change` backup.
+- A malformed fixture is rejected at startup without replacing its database file.
+- A stale SQLite connection rejects writes; simulated corrupt and unreadable HTTP 500 responses leave the pending review answer exportable instead of retrying indefinitely.
+- `npm run check`, `npm run test:server`, and `npm run test:browser` passed on the updated code.
+
 Completed using synthetic fixtures and disposable browser contexts:
 
 - `npm run check`: passed.

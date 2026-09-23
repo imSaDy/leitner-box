@@ -19,19 +19,33 @@ export class LeitnerRepository {
         this.dataDir = dataDir;
         this.filename = path.join(dataDir, 'leitner.sqlite');
         this.db = new DatabaseSync(this.filename, { timeout: 5000 });
-        this.db.exec(
-            'PRAGMA journal_mode = WAL; PRAGMA synchronous = FULL; PRAGMA foreign_keys = ON; PRAGMA trusted_schema = OFF;'
-        );
-        // Opening the schema and reading real rows below are the startup check.
-        // Full PRAGMA checks/checkpoints are intentionally kept out of startup:
-        // after an interrupted Windows session they can misjudge a valid WAL
-        // before SQLite has reopened it normally.
-        migrateDatabase(this.db);
-        const { cards: _cards, ...metadata } = emptyState();
-        this.db
-            .prepare('INSERT OR IGNORE INTO app_state(id, payload, preferences) VALUES(1, ?, ?)')
-            .run(JSON.stringify(metadata), JSON.stringify(defaultPreferences()));
         this.backups = new BackupStore(path.join(dataDir, 'backups'));
+        try {
+            // A single-user desktop app does not need WAL's concurrent readers.
+            // A rollback journal avoids a persistent WAL/main-file pair that can
+            // be separated by a file copy or interrupted repair.
+            this.assertIntegrity(this.db);
+            const mode = this.db.prepare('PRAGMA journal_mode').get().journal_mode;
+            if (mode !== 'delete') {
+                const schemaVersion = Number(this.db.prepare('PRAGMA user_version').get().user_version);
+                if (schemaVersion > 0) {
+                    const before = this.read();
+                    if (before.initialized) this.backups.write(before, 'before-journal-change');
+                }
+                const changed = this.db.prepare('PRAGMA journal_mode = DELETE').get().journal_mode;
+                if (changed !== 'delete') throw new Error(`Could not switch SQLite journal mode: ${changed}`);
+            }
+            this.db.exec('PRAGMA synchronous = EXTRA; PRAGMA foreign_keys = ON; PRAGMA trusted_schema = OFF;');
+            this.assertIntegrity(this.db);
+            migrateDatabase(this.db);
+            const { cards: _cards, ...metadata } = emptyState();
+            this.db
+                .prepare('INSERT OR IGNORE INTO app_state(id, payload, preferences) VALUES(1, ?, ?)')
+                .run(JSON.stringify(metadata), JSON.stringify(defaultPreferences()));
+        } catch (error) {
+            this.db.close();
+            throw error;
+        }
     }
     read() {
         // Keep metadata and cards in the same SQLite snapshot, including when
@@ -64,6 +78,43 @@ export class LeitnerRepository {
         return this.db.prepare('SELECT revision, request_hash FROM operations WHERE id = ?').get(id) || null;
     }
 
+    assertIntegrity(database) {
+        let result;
+        try {
+            result = database.prepare('PRAGMA integrity_check').get()?.integrity_check;
+        } catch (error) {
+            if (error.code !== 'ERR_SQLITE_ERROR' || ![11, 26].includes(error.errcode & 255)) throw error;
+            result = error.message;
+        }
+        if (result !== 'ok')
+            throw new AppError(
+                'DATABASE_CORRUPT',
+                'پایگاه داده سالم نیست. از نسخهٔ پشتیبان برای بازیابی استفاده کنید.',
+                503
+            );
+    }
+
+    assertCurrentDatabase() {
+        // A database file can be replaced while this process still holds the old
+        // SQLite connection. Compare with a fresh connection before accepting a
+        // write or reporting the service healthy.
+        const disk = new DatabaseSync(this.filename, { readOnly: true });
+        try {
+            this.assertIntegrity(disk);
+            this.assertIntegrity(this.db);
+            const diskRevision = disk.prepare('SELECT revision FROM app_state WHERE id = 1').get()?.revision;
+            const connectionRevision = this.db.prepare('SELECT revision FROM app_state WHERE id = 1').get()?.revision;
+            if (diskRevision !== connectionRevision)
+                throw new AppError(
+                    'DATABASE_CHANGED',
+                    'اتصال پایگاه داده قدیمی است. اطلاعات در انتظار را دریافت کنید و برنامه را دوباره اجرا کنید.',
+                    409
+                );
+        } finally {
+            disk.close();
+        }
+    }
+
     commit({
         state,
         preferences,
@@ -87,6 +138,7 @@ export class LeitnerRepository {
             reason,
             archive,
         });
+        this.assertCurrentDatabase();
         this.db.exec('BEGIN IMMEDIATE');
         try {
             const existing = this.operation(operationId);
@@ -190,9 +242,11 @@ export class LeitnerRepository {
         });
     }
     createBackup() {
+        this.assertCurrentDatabase();
         return this.backups.write(this.read(), 'manual');
     }
     async databaseBackup() {
+        this.assertCurrentDatabase();
         const target = path.join(
             this.dataDir,
             `leitner_${new Date().toISOString().replace(/[:.]/g, '-')}_${randomUUID().slice(0, 8)}.sqlite`

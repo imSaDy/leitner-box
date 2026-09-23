@@ -118,6 +118,8 @@ All study data stays under the current Windows account:
 
 Clearing browser storage or moving the application folder does not remove the database. Leitner Box does not upload study data to a server or cloud service.
 
+When upgrading from v2.1.3, the first launch checks the database, saves a `before-journal-change` backup, and converts a healthy WAL database to rollback journaling without persistent WAL files. If the check fails, the app stops without replacing your data. Keep the previous database files and use a verified backup for recovery.
+
 Backup restoration never runs automatically or on a timer. A restore only happens after explicit user confirmation, and the app creates a safety backup before replacing current data.
 
 ## Highlights

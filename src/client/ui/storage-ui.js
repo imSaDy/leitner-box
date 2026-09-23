@@ -22,9 +22,9 @@ export function installStorageUI(repository) {
         status.textContent = detail.message;
         message.textContent = detail.message;
         document.getElementById('btnRetryStorage').hidden = detail.status !== 'offline';
-        document.getElementById('btnEmergencyExport').hidden = detail.status !== 'offline';
-        document.getElementById('btnReloadStorage').hidden = detail.status !== 'conflict';
-        if (['saving', 'offline', 'conflict'].includes(detail.status)) lock(true);
+        document.getElementById('btnEmergencyExport').hidden = !repository.pending;
+        document.getElementById('btnReloadStorage').hidden = !['conflict', 'storage-error'].includes(detail.status);
+        if (['saving', 'offline', 'storage-error', 'conflict'].includes(detail.status)) lock(true);
         else lock(false);
     });
     for (const event of ['click', 'keydown', 'submit'])

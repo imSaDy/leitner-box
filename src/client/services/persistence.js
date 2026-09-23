@@ -55,10 +55,15 @@ export class Persistence extends EventTarget {
                 this.notify('saved', 'در پایگاه داده ذخیره شد');
                 return structuredClone(this.snapshot);
             } catch (error) {
-                // A validation/conflict response is a definitive rejection. A
-                // network loss or 5xx is ambiguous: do not invent a new write.
+                if (['DATABASE_CHANGED', 'DATABASE_CORRUPT'].includes(error.code) || error.status >= 500) {
+                    this.blocked = true;
+                    this.notify('storage-error', error.message);
+                    throw error;
+                }
+                // A validation/conflict response is a definitive rejection.
+                // A network loss is ambiguous: retry the same operation ID.
                 if (error.status && error.status < 500) {
-                    this.pending = null;
+                    if (error.code !== 'REVISION_CONFLICT') this.pending = null;
                     this.blocked = error.code === 'REVISION_CONFLICT';
                     this.notify(this.blocked ? 'conflict' : 'error', error.message);
                     throw error;

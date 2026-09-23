@@ -25,7 +25,12 @@ export class ApiClient {
             },
             ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
         });
-        const result = await response.json();
+        let result;
+        try {
+            result = await response.json();
+        } catch {
+            throw new ApiError('پاسخ برنامه خوانا نیست.', 'INVALID_RESPONSE', response.status);
+        }
         if (response.status === 403 && result.error === 'SESSION_EXPIRED' && refreshSession) {
             await this.session();
             return this.request(url, { method, body, refreshSession: false });
