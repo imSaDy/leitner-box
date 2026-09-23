@@ -1,5 +1,13 @@
 # Verification — SQLite refactor
 
+## v2.1.5 service and pending-write recovery
+
+- The Windows launcher registers a per-user scheduled task with logon and recurring triggers; the service wrapper restarts the server after an unexpected exit. A live forced-exit check restored the service and read the unchanged 4,911-card personal database at revision 2,430.
+- Before sending a change, the browser commits its exact payload and operation ID to IndexedDB. On reopening, it checks whether that operation already committed, retries it only when the revision still matches, or offers an export when there is a conflict.
+- Browser tests cover closing the window during an offline card addition and review answer, then reopening; they also cover an acknowledgement lost after a successful server commit.
+- The local data file was checked with SQLite `integrity_check=ok` and the service API was checked for matching revision and card count after startup and restart. No personal data is included in release assets.
+- `npm run check` and `npm test` pass on disposable browser profiles and synthetic databases.
+
 ## v2.1.4 storage hardening
 
 - A legacy WAL fixture with an unclosed WAL upgrades to DELETE journaling and EXTRA synchronous mode. Its latest revision and every card are preserved in a checksummed `before-journal-change` backup.

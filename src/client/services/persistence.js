@@ -1,4 +1,5 @@
 import { ApiClient } from './api.js';
+import { pendingStore } from './pending-store.js';
 import { validateState, validatePreferences } from '../../shared/validation.js';
 
 /** Acknowledged writes only. Retries retain the SAME operation ID and payload. */
@@ -14,16 +15,46 @@ export class Persistence extends EventTarget {
         this.dispatchEvent(new CustomEvent('status', { detail: { status, message } }));
     }
     async load() {
-        const snapshot = await this.api.request('/api/state');
+        const pending = await pendingStore.read();
+        if (pending) this.pending = pending;
+        let snapshot = await this.api.request('/api/state');
         validateState(snapshot.state);
         validatePreferences(snapshot.preferences);
         this.snapshot = snapshot;
+        if (pending) {
+            this.notify('saving', 'در حال بازیابی ذخیرهٔ در انتظار…');
+            const operationId = pending.body?.operationId;
+            if (typeof operationId !== 'string' || !/^[a-zA-Z0-9_-]{12,100}$/.test(operationId)) {
+                this.blocked = true;
+                this.notify('storage-error', 'اطلاعات ذخیره‌نشده پیدا شد. لطفاً نسخهٔ آن را دریافت کنید.');
+                throw new Error('The pending write has an invalid operation ID.');
+            }
+            const operation = await this.api.request(`/api/operations/${encodeURIComponent(operationId)}`);
+            if (operation.committed) {
+                await pendingStore.clear();
+                this.pending = null;
+                snapshot = await this.api.request('/api/state');
+                this.snapshot = snapshot;
+            } else if (pending.body.expectedRevision === snapshot.revision) {
+                await this.#sendPending();
+                snapshot = await this.api.request('/api/state');
+                this.snapshot = snapshot;
+            } else {
+                this.blocked = true;
+                this.notify('conflict', 'اطلاعات ذخیره‌نشده با نسخهٔ جدید تفاوت دارد. لطفاً نسخهٔ در انتظار را دریافت کنید.');
+                throw new Error('A pending write conflicts with the current database revision.');
+            }
+        }
         this.blocked = false;
         this.notify('saved', 'ذخیره در پایگاه داده');
         return structuredClone(snapshot);
     }
     retry() {
         this.#retry?.();
+    }
+    async discardPending() {
+        await pendingStore.clear();
+        this.pending = null;
     }
     async #waitForRetry(delay) {
         await new Promise((resolve) => {
@@ -51,6 +82,7 @@ export class Persistence extends EventTarget {
                 });
                 const draft = this.pending.draft;
                 this.snapshot = { revision: result.revision, initialized: true, ...structuredClone(draft) };
+                await pendingStore.clear();
                 this.pending = null;
                 this.notify('saved', 'در پایگاه داده ذخیره شد');
                 return structuredClone(this.snapshot);
@@ -63,7 +95,10 @@ export class Persistence extends EventTarget {
                 // A validation/conflict response is a definitive rejection.
                 // A network loss is ambiguous: retry the same operation ID.
                 if (error.status && error.status < 500) {
-                    if (error.code !== 'REVISION_CONFLICT') this.pending = null;
+                    if (error.code !== 'REVISION_CONFLICT') {
+                        await pendingStore.clear();
+                        this.pending = null;
+                    }
                     this.blocked = error.code === 'REVISION_CONFLICT';
                     this.notify(this.blocked ? 'conflict' : 'error', error.message);
                     throw error;
@@ -97,6 +132,13 @@ export class Persistence extends EventTarget {
             },
         };
         this.notify('saving', 'در حال ذخیره…');
+        try {
+            await pendingStore.add(this.pending);
+        } catch (error) {
+            this.blocked = true;
+            this.notify('storage-error', 'نسخهٔ ایمن تغییرات ساخته نشد. لطفاً اطلاعات در انتظار را دریافت کنید.');
+            throw error;
+        }
         return this.#sendPending();
     }
     async migrate(payload, draft, restore = false) {
@@ -108,6 +150,13 @@ export class Persistence extends EventTarget {
             body: { payload, expectedRevision: this.snapshot.revision, operationId: crypto.randomUUID(), restore },
         };
         this.notify('saving', 'در حال انتقال اطلاعات…');
+        try {
+            await pendingStore.add(this.pending);
+        } catch (error) {
+            this.blocked = true;
+            this.notify('storage-error', 'نسخهٔ ایمن تغییرات ساخته نشد. لطفاً اطلاعات در انتظار را دریافت کنید.');
+            throw error;
+        }
         return this.#sendPending();
     }
 }

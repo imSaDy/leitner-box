@@ -192,6 +192,63 @@ const check = (value, message) => {
         );
 
         console.log('PASS: automatic reconnect after a temporary outage.');
+        const closedDuringAdd = await open();
+        await closedDuringAdd.page.route('**/api/state', (route) =>
+            route.request().method() === 'PUT' ? route.abort('failed') : route.continue()
+        );
+        await add(closedDuringAdd.page, 'survives a closed window');
+        await closedDuringAdd.page.locator('#btnRetryStorage').waitFor({ state: 'visible' });
+        check(closedDuringAdd.repository.read().state.cards.length === 1, 'offline card stays uncommitted');
+        const reopenedContext = closedDuringAdd.page.context();
+        await closedDuringAdd.page.close();
+        const reopenedAdd = await reopenedContext.newPage();
+        reopenedAdd.on('pageerror', (error) => errors.push(error.message));
+        await reopenedAdd.goto(closedDuringAdd.origin);
+        await ready(reopenedAdd);
+        check(
+            closedDuringAdd.repository.read().state.cards.some((card) => card.word === 'survives a closed window'),
+            'pending card is recovered after closing and reopening the browser window'
+        );
+        check(closedDuringAdd.repository.read().revision === 2, 'recovered card commits exactly once');
+
+        const closedDuringReview = await open();
+        await closedDuringReview.page.route('**/api/state', (route) =>
+            route.request().method() === 'PUT' ? route.abort('failed') : route.continue()
+        );
+        await review(closedDuringReview.page);
+        await closedDuringReview.page.locator('#btnWrong').click();
+        await closedDuringReview.page.locator('#btnRetryStorage').waitFor({ state: 'visible' });
+        const reopenedReviewContext = closedDuringReview.page.context();
+        await closedDuringReview.page.close();
+        const reopenedReview = await reopenedReviewContext.newPage();
+        reopenedReview.on('pageerror', (error) => errors.push(error.message));
+        await reopenedReview.goto(closedDuringReview.origin);
+        await ready(reopenedReview);
+        check(closedDuringReview.repository.read().state.cards[0].reviewCount === 8, 'pending review survives browser closure');
+        check(closedDuringReview.repository.read().revision === 2, 'recovered review commits exactly once');
+
+        const committedBeforeClose = await open();
+        await committedBeforeClose.page.route('**/api/state', async (route) => {
+            if (route.request().method() !== 'PUT') return route.continue();
+            if (committedBeforeClose.repository.read().revision === 1) await route.fetch();
+            await route.abort('failed');
+        });
+        await add(committedBeforeClose.page, 'acknowledgement lost before close');
+        await committedBeforeClose.page.locator('#btnRetryStorage').waitFor({ state: 'visible' });
+        check(committedBeforeClose.repository.read().revision === 2, 'server already committed the card');
+        const committedContext = committedBeforeClose.page.context();
+        await committedBeforeClose.page.close();
+        const reopenedCommitted = await committedContext.newPage();
+        reopenedCommitted.on('pageerror', (error) => errors.push(error.message));
+        await reopenedCommitted.goto(committedBeforeClose.origin);
+        await ready(reopenedCommitted);
+        check(committedBeforeClose.repository.read().revision === 2, 'reopening does not duplicate an acknowledged write');
+        check(
+            committedBeforeClose.repository.read().state.cards.filter((card) => card.word === 'acknowledgement lost before close').length === 1,
+            'reopening reconciles the committed operation with one card'
+        );
+
+        console.log('PASS: pending cards survive browser closure and lost acknowledgements reconcile.');
         const corrupt = await open();
         let corruptRequests = 0;
         await corrupt.page.route('**/api/state', (route) => {
@@ -244,6 +301,15 @@ const check = (value, message) => {
         assert.deepEqual(conflict.repository.read().state, newer);
         checks++;
         await conflict.page.locator('#btnReloadStorage').click();
+        check(await conflict.page.locator('#btnEmergencyExport').isVisible(), 'conflicting draft requires export before reload');
+        const conflictDownload = conflict.page.waitForEvent('download');
+        await conflict.page.locator('#btnEmergencyExport').click();
+        const conflictDraft = JSON.parse(fs.readFileSync(await (await conflictDownload).path(), 'utf8'));
+        check(conflictDraft.state.cards.some((card) => card.word === 'stale card'), 'conflicting card is exportable');
+        await Promise.all([
+            conflict.page.waitForEvent('load'),
+            conflict.page.locator('#btnReloadStorage').click(),
+        ]);
         await ready(conflict.page);
         check((await conflict.page.locator('#totalCards').textContent()) === '1', 'stale window reloads newer data');
 

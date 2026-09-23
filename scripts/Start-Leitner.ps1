@@ -5,6 +5,8 @@ $dataFolder = if ($env:LEITNER_DATA_DIR) { $env:LEITNER_DATA_DIR } else { Join-P
 $portNumber = if ($env:LEITNER_PORT) { [int]$env:LEITNER_PORT } else { 8765 }
 $appAddress = "http://127.0.0.1:$portNumber"
 $serverEntry = Join-Path $launchRoot 'src\server\index.js'
+$serviceEntry = Join-Path $PSScriptRoot 'Service-Leitner.ps1'
+$taskName = 'LeitnerBoxLocalService'
 $launchMutex = New-Object System.Threading.Mutex($false, 'Local\LeitnerBoxLauncher')
 $hasLaunchLock = $false
 function Stop-StaleLeitnerService {
@@ -15,7 +17,8 @@ function Stop-StaleLeitnerService {
             $process = Get-CimInstance Win32_Process -Filter "ProcessId = $($listener.OwningProcess)" -ErrorAction Stop
             $commandLine = [string]$process.CommandLine
             $isExpectedNode = $process.Name -ieq 'node.exe' -and
-                $commandLine.IndexOf($expectedEntry, [System.StringComparison]::OrdinalIgnoreCase) -ge 0
+                ($commandLine.IndexOf($expectedEntry, [System.StringComparison]::OrdinalIgnoreCase) -ge 0 -or
+                $commandLine -match '[\\/]src[\\/]server[\\/]index\.js')
             if (-not $isExpectedNode) { continue }
             Stop-Process -Id $process.ProcessId -Force -ErrorAction Stop
             for ($attempt = 0; $attempt -lt 20; $attempt++) {
@@ -36,25 +39,49 @@ try {
     $health = $null
     $errorLog = $null
     try { $health = Invoke-RestMethod "$appAddress/api/health" -TimeoutSec 2 } catch {}
-    if ($health -and $health.application -eq 'leitner-box' -and $health.version -ne '2.1.4') {
+    $task = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
+    if ($health -and $health.application -eq 'leitner-box' -and $health.version -ne '2.1.5') {
+        if ($task) { Stop-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue }
         if (-not (Stop-StaleLeitnerService)) {
             throw 'An older Leitner service is still running. Close it or restart Windows, then try again.'
         }
         $health = $null
     }
     if ($health -and $health.application -eq 'leitner-box' -and -not $health.ready) {
+        if ($task) { Stop-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue }
         if (-not (Stop-StaleLeitnerService)) {
             throw 'The Leitner database connection needs a restart. Close the earlier service, then try again.'
         }
         $health = $null
     }
-    if (-not $health) {
+    $expectedTaskArgument = '-NoProfile -ExecutionPolicy Bypass -File "' + $serviceEntry + '"'
+    if ($task -and ($task.Actions[0].Execute -ne (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe') -or
+        $task.Actions[0].Arguments -ne $expectedTaskArgument -or $task.Triggers.Count -lt 2)) {
+        Stop-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
+        Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
+        $task = $null
+        Stop-StaleLeitnerService | Out-Null
+        $health = $null
+    }
+    if (-not $task) {
+        if ($health -and $health.application -eq 'leitner-box') {
+            Stop-StaleLeitnerService | Out-Null
+            $health = $null
+        }
+        $action = New-ScheduledTaskAction -Execute (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe') -Argument $expectedTaskArgument -WorkingDirectory $launchRoot
+        $trigger = @(
+            (New-ScheduledTaskTrigger -AtLogOn -User ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name)),
+            (New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1) -RepetitionInterval (New-TimeSpan -Minutes 1) -RepetitionDuration (New-TimeSpan -Days 3650))
+        )
+        $principal = New-ScheduledTaskPrincipal -UserId ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name) -LogonType Interactive -RunLevel Limited
+        $settings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit ([TimeSpan]::Zero) -RestartCount 999 -RestartInterval (New-TimeSpan -Minutes 1) -MultipleInstances IgnoreNew -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
+        Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Force | Out-Null
+        $task = Get-ScheduledTask -TaskName $taskName
+    }
+    if (-not $health -or $task.State -ne 'Running') {
         $logFolder = Join-Path $dataFolder 'logs'
         New-Item -ItemType Directory -Path $logFolder -Force | Out-Null
-        $logStamp = Get-Date -Format 'yyyyMMdd-HHmmss-fff'
-        $outputLog = Join-Path $logFolder "server-$logStamp.log"
-        $errorLog = Join-Path $logFolder "server-$logStamp-error.log"
-        Start-Process -FilePath $nodeExecutable -ArgumentList @('--disable-warning=ExperimentalWarning', ('"' + $serverEntry + '"')) -WorkingDirectory $launchRoot -WindowStyle Hidden -RedirectStandardOutput $outputLog -RedirectStandardError $errorLog | Out-Null
+        if ($task.State -ne 'Running') { Start-ScheduledTask -TaskName $taskName }
         Get-ChildItem -LiteralPath $logFolder -File -Filter 'server-*.log' |
             Sort-Object LastWriteTime -Descending |
             Select-Object -Skip 40 |
@@ -65,14 +92,18 @@ try {
         }
     }
     if (-not $health) {
+        if (-not $errorLog) {
+            $errorLog = Get-ChildItem -LiteralPath (Join-Path $dataFolder 'logs') -File -Filter 'server-*-error.log' -ErrorAction SilentlyContinue |
+                Sort-Object LastWriteTime -Descending |
+                Select-Object -First 1 -ExpandProperty FullName
+        }
         $detail = if ($errorLog -and (Test-Path -LiteralPath $errorLog)) {
             (Get-Content -LiteralPath $errorLog -Raw).Trim()
-        } else {
-            'The local service did not respond.'
-        }
+        } else { '' }
+        if (-not $detail) { $detail = 'The local service did not respond.' }
         throw "Leitner could not start.`n`n$detail`n`nLog: $errorLog"
     }
-    if ($health.application -ne 'leitner-box' -or $health.version -ne '2.1.4') {
+    if ($health.application -ne 'leitner-box' -or $health.version -ne '2.1.5') {
         throw "Another application is using port $portNumber."
     }
     if ($NoBrowser) { Write-Output $appAddress; exit 0 }

@@ -12,12 +12,16 @@ export function installStorageUI(repository) {
     const status = document.getElementById('storageStatus');
     const message = document.getElementById('persistenceMessage');
     let locked = false;
+    let exportedPending = false;
+    let lastPending = null;
     function lock(value) {
         locked = value;
         overlay.hidden = !value;
         document.body.classList.toggle('storage-busy', value);
     }
     repository.addEventListener('status', ({ detail }) => {
+        if (lastPending !== repository.pending) exportedPending = false;
+        lastPending = repository.pending;
         status.dataset.state = detail.status;
         status.textContent = detail.message;
         message.textContent = detail.message;
@@ -39,10 +43,27 @@ export function installStorageUI(repository) {
             true
         );
     document.getElementById('btnRetryStorage').addEventListener('click', () => repository.retry());
-    document.getElementById('btnReloadStorage').addEventListener('click', () => location.reload());
+    document.getElementById('btnReloadStorage').addEventListener('click', async () => {
+        if (repository.pending) {
+            if (!exportedPending) {
+                message.textContent = 'ابتدا نسخهٔ اطلاعات در انتظار را دریافت کنید، سپس دوباره بارگذاری کنید.';
+                return;
+            }
+            try {
+                await repository.discardPending();
+            } catch (error) {
+                message.textContent = error.message;
+                return;
+            }
+        }
+        location.reload();
+    });
     document.getElementById('btnEmergencyExport').addEventListener('click', () => {
         const draft = repository.pending?.draft;
-        if (draft) downloadJson({ format: 'leitner-backup-v2', ...draft }, 'leitner-pending-save.json');
+        if (draft) {
+            downloadJson({ format: 'leitner-backup-v2', ...draft }, 'leitner-pending-save.json');
+            exportedPending = true;
+        }
     });
     window.addEventListener('beforeunload', (event) => {
         if (repository.pending) {
