@@ -101,7 +101,7 @@ Add a word, phrase, or sentence with a meaning and topic. Examples, notes, and s
 3. Double-click **`Install Leitner.cmd`**.
 4. Open **Leitner Box** from the new desktop shortcut.
 
-To run without creating a shortcut, double-click **`Start Leitner.cmd`**.
+To run without creating a shortcut, double-click **`Start Leitner.vbs`**. The `.cmd` starter remains available for terminal use.
 
 Daily study works offline. Online pronunciation and web fonts require an internet connection.
 

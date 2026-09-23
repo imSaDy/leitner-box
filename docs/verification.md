@@ -1,5 +1,12 @@
 # Verification — SQLite refactor
 
+## v2.1.6 windowless launcher
+
+- The desktop shortcut uses Windows Script Host to start the PowerShell launcher without a console window.
+- The scheduled service task passes `-WindowStyle Hidden`; the `.cmd` fallback exits immediately after handing off to the windowless starter.
+- The installed shortcut target and task action were inspected on Windows, the VBScript command was syntax-checked with `cscript`, and the local service stayed ready with the existing database after the update.
+- `npm run check` and `npm test` pass.
+
 ## v2.1.5 service and pending-write recovery
 
 - The Windows launcher registers a per-user scheduled task with logon and recurring triggers; the service wrapper restarts the server after an unexpected exit. A live forced-exit check restored the service and read the unchanged 4,911-card personal database at revision 2,430.

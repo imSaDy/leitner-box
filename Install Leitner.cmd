@@ -10,6 +10,6 @@ if errorlevel 1 (
 )
 echo.
 echo Leitner Box shortcut was added to your Desktop.
-echo You can move this window aside while the app starts.
-powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%~dp0scripts\Start-Leitner.ps1"
+echo The app is starting now.
+start "" /b wscript.exe "%~dp0Start Leitner.vbs"
 endlocal
