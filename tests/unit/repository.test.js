@@ -97,6 +97,7 @@ test('a connection holding an old SQLite snapshot cannot accept a write', (t) =>
     const second = new DatabaseSync(first.filename);
     try {
         second.prepare('UPDATE app_state SET revision = revision + 1 WHERE id = 1').run();
+        assert.throws(() => first.assertCurrentDatabase({ verifyIntegrity: false }), { code: 'DATABASE_CHANGED' });
         assert.throws(() => first.assertCurrentDatabase(), { code: 'DATABASE_CHANGED' });
     } finally {
         first.db.exec('ROLLBACK');

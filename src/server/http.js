@@ -66,14 +66,14 @@ export function createApplicationServer(repository, config) {
                 let databaseIssue = repository.storageFailure || null;
                 if (!databaseIssue) {
                     try {
-                        repository.assertCurrentDatabase();
+                        repository.assertCurrentDatabase({ verifyIntegrity: false });
                     } catch (error) {
                         databaseIssue = error.code || 'DATABASE_UNAVAILABLE';
                     }
                 }
                 json(res, 200, {
                     application: 'leitner-box',
-                    version: '2.1.7',
+                    version: '2.1.8',
                     database: 'sqlite',
                     ready: !databaseIssue,
                     ...(databaseIssue ? { databaseIssue } : {}),

@@ -1,5 +1,13 @@
 # Verification — SQLite refactor
 
+## v2.1.8 review-save responsiveness
+
+- The supervised service probes `/api/health` every three seconds. On the 4,933-card local library, 30 consecutive health requests took about 199 ms on average before this change, with an earlier 4.8-second outlier.
+- Health checks now compare the database revision through a fresh read-only connection without rescanning every SQLite page. Full integrity checks still run on startup, state reads and writes.
+- On a synthetic 4,933-card database, a full connection check averaged 17 ms and the lightweight health check averaged 1 ms. The stale-connection unit test covers both paths.
+- After updating the installed 4,933-card library, 30 health requests averaged 49 ms (maximum 107 ms). The database remained ready at revision 2,451, with the same 4,933 cards before and after the update.
+- `npm run check`, `npm test`, a longer local-library health sample and the extracted release ZIP smoke test passed.
+
 ## v2.1.7 unresponsive-service recovery
 
 - A separate scheduled-task fixture bound port 8768 and deliberately blocked the Node event loop. The service watchdog detected failed health checks, killed that process and started a new one. The fixture task and process were stopped after the check.

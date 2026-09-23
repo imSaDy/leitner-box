@@ -94,14 +94,16 @@ export class LeitnerRepository {
             );
     }
 
-    assertCurrentDatabase() {
+    assertCurrentDatabase({ verifyIntegrity = true } = {}) {
         // A database file can be replaced while this process still holds the old
         // SQLite connection. Compare with a fresh connection before accepting a
         // write or reporting the service healthy.
         const disk = new DatabaseSync(this.filename, { readOnly: true });
         try {
-            this.assertIntegrity(disk);
-            this.assertIntegrity(this.db);
+            if (verifyIntegrity) {
+                this.assertIntegrity(disk);
+                this.assertIntegrity(this.db);
+            }
             const diskRevision = disk.prepare('SELECT revision FROM app_state WHERE id = 1').get()?.revision;
             const connectionRevision = this.db.prepare('SELECT revision FROM app_state WHERE id = 1').get()?.revision;
             if (diskRevision !== connectionRevision)
