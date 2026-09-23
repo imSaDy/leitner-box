@@ -23,7 +23,7 @@ Function ServiceReady()
     response = request.ResponseText
     On Error GoTo 0
     ServiceReady = status = 200 And InStr(response, """application"":""leitner-box""") > 0 And _
-        InStr(response, """version"":""2.1.9""") > 0 And InStr(response, """ready"":true") > 0
+        InStr(response, """version"":""2.1.10""") > 0 And InStr(response, """ready"":true") > 0
 End Function
 
 ready = False

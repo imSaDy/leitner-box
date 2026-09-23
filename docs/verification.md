@@ -1,11 +1,20 @@
 # Verification — SQLite refactor
 
+## v2.1.10 background terminal fix
+
+- The previous `LeitnerBoxLocalService` task launched PowerShell at logon and again every minute. Its hidden-window argument did not prevent a console flash during process creation.
+- The task now runs `Supervise-Leitner.vbs` through `wscript.exe`, with a single logon trigger and the task's Hidden setting enabled. The supervisor launches Node without a console, probes health, and restarts it if it exits or stops answering.
+- An isolated scheduled-task fixture confirmed that a hung Node process was replaced by a new hidden Node process. The fixture task and its child were removed afterward.
+- The installed task now has one trigger and a `wscript.exe` action. The live service reports v2.1.10 ready, and its personal database still has 4,933 cards at revision 2,455.
+- After several minute boundaries, no Leitner PowerShell or CMD process was present and the task and hidden Node process remained running. Twenty health requests after the full test suite completed all succeeded (mean 84 ms, maximum 179 ms).
+- `npm run check` and `npm test` passed, including server, storage recovery, review workflow, and browser layout checks.
+
 ## v2.1.9 quiet daily launch
 
 - The desktop shortcut's VBScript checks local service health and opens the browser directly when the expected version is ready. This routine path starts no new PowerShell process.
 - If the service is unavailable or outdated, the existing PowerShell recovery launcher still runs with a hidden window.
 - The recovery launcher now accepts the old service having already closed its port during an upgrade; an isolated port test also confirms it rejects an unrelated listener.
-- The installed desktop shortcut still targets `wscript.exe`; the scheduled background PowerShell service has no visible main window.
+- The installed desktop shortcut still targets `wscript.exe`. The background task remained PowerShell-based in this version, which could show a brief console window when Task Scheduler started it.
 - `cscript` probe, a normal installed VBScript launch, server/browser tests, and an extracted release ZIP smoke test passed.
 
 ## v2.1.8 review-save responsiveness

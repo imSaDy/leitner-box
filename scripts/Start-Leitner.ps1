@@ -5,7 +5,7 @@ $dataFolder = if ($env:LEITNER_DATA_DIR) { $env:LEITNER_DATA_DIR } else { Join-P
 $portNumber = if ($env:LEITNER_PORT) { [int]$env:LEITNER_PORT } else { 8765 }
 $appAddress = "http://127.0.0.1:$portNumber"
 $serverEntry = Join-Path $launchRoot 'src\server\index.js'
-$serviceEntry = Join-Path $PSScriptRoot 'Service-Leitner.ps1'
+$supervisorEntry = Join-Path $PSScriptRoot 'Supervise-Leitner.vbs'
 $taskName = 'LeitnerBoxLocalService'
 $launchMutex = New-Object System.Threading.Mutex($false, 'Local\LeitnerBoxLauncher')
 $hasLaunchLock = $false
@@ -47,7 +47,7 @@ try {
     $errorLog = $null
     try { $health = Invoke-RestMethod "$appAddress/api/health" -TimeoutSec 2 } catch {}
     $task = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
-    if ($health -and $health.application -eq 'leitner-box' -and $health.version -ne '2.1.9') {
+    if ($health -and $health.application -eq 'leitner-box' -and $health.version -ne '2.1.10') {
         if ($task) { Stop-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue }
         if (-not (Stop-StaleLeitnerService)) {
             throw 'An older Leitner service is still running. Close it or restart Windows, then try again.'
@@ -61,9 +61,9 @@ try {
         }
         $health = $null
     }
-    $expectedTaskArgument = '-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "' + $serviceEntry + '"'
-    if ($task -and ($task.Actions[0].Execute -ne (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe') -or
-        $task.Actions[0].Arguments -ne $expectedTaskArgument -or $task.Triggers.Count -lt 2)) {
+    $expectedTaskArgument = '"' + $supervisorEntry + '" "' + $nodeExecutable + '"'
+    if ($task -and ($task.Actions[0].Execute -ne (Join-Path $env:SystemRoot 'System32\wscript.exe') -or
+        $task.Actions[0].Arguments -ne $expectedTaskArgument -or $task.Triggers.Count -ne 1 -or -not $task.Settings.Hidden)) {
         Stop-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
         Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
         $task = $null
@@ -75,13 +75,10 @@ try {
             Stop-StaleLeitnerService | Out-Null
             $health = $null
         }
-        $action = New-ScheduledTaskAction -Execute (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe') -Argument $expectedTaskArgument -WorkingDirectory $launchRoot
-        $trigger = @(
-            (New-ScheduledTaskTrigger -AtLogOn -User ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name)),
-            (New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1) -RepetitionInterval (New-TimeSpan -Minutes 1) -RepetitionDuration (New-TimeSpan -Days 3650))
-        )
+        $action = New-ScheduledTaskAction -Execute (Join-Path $env:SystemRoot 'System32\wscript.exe') -Argument $expectedTaskArgument -WorkingDirectory $launchRoot
+        $trigger = New-ScheduledTaskTrigger -AtLogOn -User ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name)
         $principal = New-ScheduledTaskPrincipal -UserId ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name) -LogonType Interactive -RunLevel Limited
-        $settings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit ([TimeSpan]::Zero) -RestartCount 999 -RestartInterval (New-TimeSpan -Minutes 1) -MultipleInstances IgnoreNew -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
+        $settings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit ([TimeSpan]::Zero) -RestartCount 999 -RestartInterval (New-TimeSpan -Minutes 1) -MultipleInstances IgnoreNew -Hidden -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
         Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Force | Out-Null
         $task = Get-ScheduledTask -TaskName $taskName
     }
@@ -124,7 +121,7 @@ try {
         if (-not $detail) { $detail = 'The local service did not respond.' }
         throw "Leitner could not start.`n`n$detail`n`nLog: $errorLog"
     }
-    if ($health.application -ne 'leitner-box' -or $health.version -ne '2.1.9') {
+    if ($health.application -ne 'leitner-box' -or $health.version -ne '2.1.10') {
         throw "Another application is using port $portNumber."
     }
     if ($NoBrowser) { Write-Output $appAddress; exit 0 }
