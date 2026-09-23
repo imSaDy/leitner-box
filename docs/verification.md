@@ -1,5 +1,13 @@
 # Verification — SQLite refactor
 
+## v2.1.9 quiet daily launch
+
+- The desktop shortcut's VBScript checks local service health and opens the browser directly when the expected version is ready. This routine path starts no new PowerShell process.
+- If the service is unavailable or outdated, the existing PowerShell recovery launcher still runs with a hidden window.
+- The recovery launcher now accepts the old service having already closed its port during an upgrade; an isolated port test also confirms it rejects an unrelated listener.
+- The installed desktop shortcut still targets `wscript.exe`; the scheduled background PowerShell service has no visible main window.
+- `cscript` probe, a normal installed VBScript launch, server/browser tests, and an extracted release ZIP smoke test passed.
+
 ## v2.1.8 review-save responsiveness
 
 - The supervised service probes `/api/health` every three seconds. On the 4,933-card local library, 30 consecutive health requests took about 199 ms on average before this change, with an earlier 4.8-second outlier.

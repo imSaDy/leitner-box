@@ -28,7 +28,11 @@ function Stop-StaleLeitnerService {
             }
         }
     } catch {}
-    return $false
+    # Stopping the scheduled task may already have closed the old listener.
+    # An empty port is the successful state, even when there was no process
+    # left for this function to kill.
+    $remaining = Get-NetTCPConnection -LocalPort $portNumber -State Listen -ErrorAction SilentlyContinue
+    return -not [bool]$remaining
 }
 try {
     $hasLaunchLock = $launchMutex.WaitOne(15000)
@@ -43,7 +47,7 @@ try {
     $errorLog = $null
     try { $health = Invoke-RestMethod "$appAddress/api/health" -TimeoutSec 2 } catch {}
     $task = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
-    if ($health -and $health.application -eq 'leitner-box' -and $health.version -ne '2.1.8') {
+    if ($health -and $health.application -eq 'leitner-box' -and $health.version -ne '2.1.9') {
         if ($task) { Stop-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue }
         if (-not (Stop-StaleLeitnerService)) {
             throw 'An older Leitner service is still running. Close it or restart Windows, then try again.'
@@ -120,7 +124,7 @@ try {
         if (-not $detail) { $detail = 'The local service did not respond.' }
         throw "Leitner could not start.`n`n$detail`n`nLog: $errorLog"
     }
-    if ($health.application -ne 'leitner-box' -or $health.version -ne '2.1.8') {
+    if ($health.application -ne 'leitner-box' -or $health.version -ne '2.1.9') {
         throw "Another application is using port $portNumber."
     }
     if ($NoBrowser) { Write-Output $appAddress; exit 0 }
